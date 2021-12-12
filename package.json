@@ -1,0 +1,41 @@
+{
+  "name": "tetu_alerts",
+  "version": "1.0.0",
+  "description": "TETU alerts",
+  "scripts": {
+    "start": "ts-node src/Main.ts",
+    "build": "typechain --target ethers-v5 ./abi/*.json",
+    "dev": "nodemon -x ts-node src/Main.ts"
+  },
+  "author": "TETU team",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.3.3",
+    "dotenv": "^10.0.0",
+    "ethereumjs-tx": "^2.1.2",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.12",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5",
+    "web3": "^1.4.0",
+    "typechain": "^5.2.0",
+    "@typechain/ethers-v5": "^7.2.0",
+    "axios": "^0.21.4",
+    "ethers": "^5.4.7",
+    "solc-0.8.4": "npm:solc@^0.8.9",
+    "tslog": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/chai-as-promised": "^7.1.4",
+    "@types/chai-string": "^1.4.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^8.4.0"
+  },
+  "engines": {
+    "node": "12.20.1"
+  }
+}
