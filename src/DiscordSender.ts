@@ -32,8 +32,10 @@ export class DiscordSender {
     }
 
     const url = new Config().userActionDiscord;
-    const http = axios.create();
-    await http.post(url, params, {headers: HEADERS});
+    if (url && url !== '') {
+      const http = axios.create();
+      await http.post(url, params, {headers: HEADERS});
+    }
   }
 
   public static async sendStrategyEarned(
@@ -60,8 +62,10 @@ export class DiscordSender {
     }
 
     const url = new Config().strategyEarnednDiscord;
-    const http = axios.create();
-    await http.post(url, params, {headers: HEADERS});
+    if (url && url !== '') {
+      const http = axios.create();
+      await http.post(url, params, {headers: HEADERS});
+    }
   }
 
   private static hexToDecimal(hex: string) {
