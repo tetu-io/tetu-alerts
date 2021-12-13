@@ -25,6 +25,7 @@ export class Parser {
     const core = await Utils.getCoreAddresses(provider);
     const tools = await Utils.getToolsAddresses(provider);
 
+    const announceHandler = new AnnouncerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const bookkeeperHandler = new BookkeeperHandler(provider, ContractReader__factory.connect(tools.reader, provider));
 
     const announcer = Announcer__factory.connect(core.announcer, provider);
@@ -40,32 +41,32 @@ export class Parser {
     });
 
     // ************** ANNOUNCER ***********************
-    announcer.on(announcer.filters.AddressChangeAnnounce(), async (opCode, newAddress) => {
-      await AnnouncerHandler.handleAddressChange(opCode, newAddress);
+    announcer.on(announcer.filters.AddressChangeAnnounce(), async (opCode, newAddress, event) => {
+      await announceHandler.handleAddressChange(opCode, newAddress, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.UintChangeAnnounce(), async (opCode, newValue) => {
-      await AnnouncerHandler.handleUintChange(opCode, newValue);
+    announcer.on(announcer.filters.UintChangeAnnounce(), async (opCode, newValue, event) => {
+      await announceHandler.handleUintChange(opCode, newValue, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.RatioChangeAnnounced(), async (opCode, numerator, denominator) => {
-      await AnnouncerHandler.handleRatioChange(opCode, numerator, denominator);
+    announcer.on(announcer.filters.RatioChangeAnnounced(), async (opCode, numerator, denominator, event) => {
+      await announceHandler.handleRatioChange(opCode, numerator, denominator, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.TokenMoveAnnounced(), async (opCode, target, token, amount) => {
-      await AnnouncerHandler.handleTokenMove(opCode, target, token, amount);
+    announcer.on(announcer.filters.TokenMoveAnnounced(), async (opCode, target, token, amount, event) => {
+      await announceHandler.handleTokenMove(opCode, target, token, amount, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.ProxyUpgradeAnnounced(), async (contract, implementation) => {
-      await AnnouncerHandler.handleProxyUpgrade(contract, implementation);
+    announcer.on(announcer.filters.ProxyUpgradeAnnounced(), async (contract, implementation, event) => {
+      await announceHandler.handleProxyUpgrade(contract, implementation, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.MintAnnounced(), async (totalAmount, distributor, otherNetworkFund) => {
-      await AnnouncerHandler.handleMint(totalAmount, distributor, otherNetworkFund);
+    announcer.on(announcer.filters.MintAnnounced(), async (totalAmount, distributor, otherNetworkFund, event) => {
+      await announceHandler.handleMint(totalAmount, distributor, otherNetworkFund, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.AnnounceClosed(), async (opHash) => {
-      await AnnouncerHandler.handleClose(opHash);
+    announcer.on(announcer.filters.AnnounceClosed(), async (opHash, event) => {
+      await announceHandler.handleClose(opHash, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.StrategyUpgradeAnnounced(), async (vault, strategy) => {
-      await AnnouncerHandler.handleStrategyUpgrade(vault, strategy);
+    announcer.on(announcer.filters.StrategyUpgradeAnnounced(), async (vault, strategy, event) => {
+      await announceHandler.handleStrategyUpgrade(vault, strategy, await event.getTransactionReceipt());
     });
-    announcer.on(announcer.filters.VaultStop(), async (vault) => {
-      await AnnouncerHandler.handleVaultStop(vault);
+    announcer.on(announcer.filters.VaultStop(), async (vault, event) => {
+      await announceHandler.handleVaultStop(vault, await event.getTransactionReceipt());
     });
   }
 

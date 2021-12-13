@@ -1,5 +1,6 @@
 import {Config} from "./Config";
 import axios from "axios";
+import {Utils} from "./Utils";
 
 const NAME = 'Tetu Parser';
 const AVATAR = 'https://i.ibb.co/Gcv8DK8/61-Vu-N0-Xdh4-L.jpg';
@@ -21,7 +22,7 @@ export class DiscordSender {
       avatar_url: AVATAR,
       embeds: [{
         title: (deposit ? ':money_mouth: Deposit' : ':pleading_face: Withdraw') + ' on ' + network,
-        url: DiscordSender.networkScanUrl() + '/tx/' + txHash,
+        url: Utils.networkScanUrl() + '/tx/' + txHash,
         color: deposit ? DiscordSender.hexToDecimal("#25a826") : DiscordSender.hexToDecimal("#b32424"),
         fields: [{
           name: vaultName,
@@ -30,12 +31,7 @@ export class DiscordSender {
         }],
       }]
     }
-
-    const url = new Config().userActionDiscord;
-    if (url && url !== '') {
-      const http = axios.create();
-      await http.post(url, params, {headers: HEADERS});
-    }
+    await DiscordSender.send(new Config().userActionDiscord, params);
   }
 
   public static async sendStrategyEarned(
@@ -51,7 +47,7 @@ export class DiscordSender {
       avatar_url: AVATAR,
       embeds: [{
         title: `${DiscordSender.emojiEarnedOnAmount(+usdAmount)} ${vaultNamePretty} earned on ${network}`,
-        url: DiscordSender.networkScanUrl() + '/tx/' + txHash,
+        url: Utils.networkScanUrl() + '/tx/' + txHash,
         color: DiscordSender.hexToDecimal("#686868"),
         fields: [{
           name: `Strategy type: ${strategyName}`,
@@ -60,26 +56,43 @@ export class DiscordSender {
         }],
       }]
     }
+    await DiscordSender.send(new Config().strategyEarnedDiscord, params);
+  }
 
-    const url = new Config().strategyEarnednDiscord;
+  public static async sendAnnounces(
+    txHash: string,
+    titleText: string,
+    name: string,
+    value: string,
+  ) {
+    const params = {
+      username: NAME,
+      avatar_url: AVATAR,
+      embeds: [{
+        title: titleText,
+        url: Utils.networkScanUrl() + '/tx/' + txHash,
+        color: DiscordSender.hexToDecimal("#3a3f89"),
+        fields: [{
+          name: name,
+          value: value,
+          inline: true,
+        }],
+      }]
+    }
+    await DiscordSender.send(new Config().timeLocksDiscord, params);
+  }
+
+  // *******************************************
+
+  private static async send(url: string, params: any) {
     if (url && url !== '') {
       const http = axios.create();
       await http.post(url, params, {headers: HEADERS});
     }
   }
 
-  private static hexToDecimal(hex: string) {
+  public static hexToDecimal(hex: string) {
     return parseInt(hex.replace("#", ""), 16)
-  }
-
-  private static networkScanUrl() {
-    const net = new Config().net;
-    switch (net) {
-      case 'matic':
-        return 'https://polygonscan.com';
-      case 'fantom':
-        return 'https://ftmscan.com';
-    }
   }
 
   private static emojiEarnedOnAmount(n: number) {
@@ -90,13 +103,6 @@ export class DiscordSender {
       return ':relaxed:';
     }
     return ':exploding_head:';
-  }
-
-  private static txHashPrettify(hash: string) {
-    if (hash.length < 8) {
-      return hash;
-    }
-    return hash.substr(0, 6) + '...' + hash.substr(hash.length - 5)
   }
 
 }

@@ -3,6 +3,7 @@ import {CoreAddresses} from "./addresses/CoreAddresses";
 import {Addresses} from "./addresses/addresses";
 import {ToolsAddresses} from "./addresses/ToolsAddresses";
 import {SpeedUp} from "./SpeedUp";
+import {Config} from "./Config";
 
 export class Utils {
 
@@ -97,5 +98,37 @@ export class Utils {
       name = name.replace(/TETU_/g, '')
     }
     return name;
+  }
+
+  public static networkScanUrl() {
+    const net = new Config().net;
+    switch (net) {
+      case 'matic':
+        return 'https://polygonscan.com';
+      case 'fantom':
+        return 'https://ftmscan.com';
+    }
+  }
+
+  public static networkScanUrlApi() {
+    const net = new Config().net;
+    switch (net) {
+      case 'matic':
+        return 'https://api.polygonscan.com/api';
+      case 'fantom':
+        return 'https://api.ftmscan.com/api';
+    }
+  }
+
+  public static abiScanUrl(contract: string) {
+    const apiKey = new Config().networkScanApiKey;
+    return Utils.networkScanUrlApi() + `?module=contract&action=getsourcecode&address=${contract}&apikey=${apiKey}`;
+  }
+
+  public static txHashPrettify(hash: string) {
+    if (hash.length < 8) {
+      return hash;
+    }
+    return hash.substr(0, 5) + '...' + hash.substr(hash.length - 4)
   }
 }

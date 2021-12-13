@@ -3,5 +3,12 @@ export class Constants {
   public static USER_ACTION_HASH = '0x5e996c1c2e34bf4be685943a52557af075b96e16f7603ce2841db6a7ac807e21'.toLowerCase();
   public static DEPOSIT_HASH = '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c'.toLowerCase();
   public static WITHDRAW_HASH = '0x884edad9ce6fa2440d8a54cc123490eb96d2768479d49ff9c7366125a9424364'.toLowerCase();
+  public static ADDRESS_CHANGE_ANNOUNCE_HASH = '0xec51865481e134a273f5e0513f108da62434bc35133562e8163d5e9e90494e25'.toLowerCase();
+  public static TOKEN_MOVE_ANNOUNCED_HASH = '0x270f8e0d0b0cebc373f92498118829c12e4328e3d18a5f995486391be2e30058'.toLowerCase();
+  public static PROXY_UPGRADE_ANNOUNCED_HASH = '0xc654dba084e531d8a1ccba8dff839df3a215096b6f64c52c10978e12c7401b2b'.toLowerCase();
+  public static MINT_ANNOUNCED_HASH = '0x6958eb80038e96c7170b066b17d2d71e03d71e15628ea045b4786a126b6ce292'.toLowerCase();
+  public static ANNOUNCE_CLOSED_HASH = '0x6c2889b3fb1d7d56b3972761ed3c0d281e6d886d282066a064fc88d7392c06b2'.toLowerCase();
+  public static STRATEGY_UPGRADE_ANNOUNCED_HASH = '0xce277b4416c13601aec38662f1dea8f6166df6a8d119c54b83c53a3f19e80778'.toLowerCase();
+  public static VAULT_STOP_HASH = '0x1ae1cf33202dbf1d995cfed8ffc46d5c7cfc128f0b11c3e7b98d12f641dba874'.toLowerCase();
 
 }
