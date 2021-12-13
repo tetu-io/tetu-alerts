@@ -10,12 +10,11 @@ import {
 import {TransactionReceipt} from "@ethersproject/abstract-provider";
 import {Logger} from "tslog";
 import logSettings from "../log_settings";
-import {Constants} from "./Constants";
 import {Config} from "./Config";
 
 const log: Logger = new Logger(logSettings);
 
-const MIN_USER_ACTION_REPORT_VALUE = 10000;
+const MIN_USER_ACTION_REPORT_VALUE = 1000;
 const MIN_EARNED_REPORT_VALUE = 10;
 const MAX_ERRORS = 5;
 
@@ -56,23 +55,12 @@ export class BookkeeperHandler {
         }
         const core = await Utils.getCoreAddresses(this.provider);
         const controller = Controller__factory.connect(core.controller, this.provider);
-        let vaultAdr;
-        for (const log of receipt.logs) {
-          if (log.topics[0].toLowerCase() === Constants.WITHDRAW_HASH
-            || log.topics[0].toLowerCase() === Constants.DEPOSIT_HASH
-          ) {
-            const isVault = await controller.isValidVault(log.address)
-            if (isVault) {
-              vaultAdr = log.address;
-              break;
-            }
-          }
-        }
-        if (!vaultAdr) {
-          log.error('Vault address not found', receipt.transactionHash)
+        let vaultAdr = receipt.to;
+        const isVault = await controller.isValidVault(receipt.to)
+        if (!isVault) {
           return {
             'deposit': deposit,
-            'vaultNamePretty': 'VAULT NOT FOUND',
+            'vaultNamePretty': 'NOT DIRECT CALL ON VAULT',
             'usdValue': '0',
             'txHash': receipt.transactionHash
           }
