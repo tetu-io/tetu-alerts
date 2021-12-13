@@ -53,7 +53,7 @@ export class DiscordSender {
         color: DiscordSender.hexToDecimal("#686868"),
         fields: [{
           name: `Strategy type: ${strategyName}`,
-          value: `Earned ${amountN}TETU ($${usdAmount})`,
+          value: `Earned ${amountN} TETU ($${usdAmount})`,
           inline: true,
         }],
       }]
@@ -79,10 +79,10 @@ export class DiscordSender {
   }
 
   private static emojiEarnedOnAmount(n: number) {
-    if (n < 10) {
+    if (n < 100) {
       return ':smirk:';
     }
-    if (n < 100) {
+    if (n < 1000) {
       return ':relaxed:';
     }
     return ':exploding_head:';

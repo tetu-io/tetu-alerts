@@ -2,9 +2,10 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import {BookkeeperHandler} from "../src/BookkeeperHandler";
 import {Config} from "../src/Config";
-import {BigNumber, ethers, utils} from "ethers";
+import {ethers, utils} from "ethers";
 import {Utils} from "../src/Utils";
-import {ContractReader__factory} from "../types/ethers-contracts";
+import {Bookkeeper__factory, ContractReader__factory} from "../types/ethers-contracts";
+import {Constants} from "../src/Constants";
 
 require('dotenv').config();
 const {expect} = chai;
@@ -24,25 +25,37 @@ describe("BookkeeperHandlerTest", function () {
 
 
   it("handleUserAction MATIC WITHDRAW test", async () => {
-    const receipt = await provider.getTransactionReceipt('0xaab59e42962b77407f524ca791a8167d3c369591a566a7d246a8d46093bcbb85');
-    const result = await bookkeeperHandler.handleUserAction(
-      '0x4d37160dbce959292e1ca5d3415448688fe43444',
-      utils.parseUnits('2000.102022', 6),
-      false,
-      receipt
-    );
-    expect(+result.usdValue).is.greaterThan(0);
+    await check('0x39a1a60d179063fc06a0bc10afe06c6fff7fb38ef6b42c8dd9b3198f6fa82da4', provider, bookkeeperHandler);
   });
 
   it("handleUserAction MATIC DEPOSIT test", async () => {
-    const receipt = await provider.getTransactionReceipt('0xaab59e42962b77407f524ca791a8167d3c369591a566a7d246a8d46093bcbb85');
-    const result = await bookkeeperHandler.handleUserAction(
-      '0x4d37160dbce959292e1ca5d3415448688fe43444',
-      utils.parseUnits('2000.102022', 6),
-      true,
-      receipt
-    );
-    expect(+result.usdValue).is.greaterThan(0);
+    await check('0xaab59e42962b77407f524ca791a8167d3c369591a566a7d246a8d46093bcbb85', provider, bookkeeperHandler);
   });
 
 });
+
+
+async function check(hash: string, provider: ethers.providers.JsonRpcProvider, bookkeeperHandler: BookkeeperHandler) {
+  const receipt = await provider.getTransactionReceipt(hash);
+  let log = null;
+  for (const l of receipt.logs) {
+    if (l.topics[0].toLowerCase() === Constants.USER_ACTION_HASH) {
+      log = l;
+      break;
+    }
+  }
+  expect(log !== null).is.eq(true);
+  if (!log) {
+    return;
+  }
+
+  const parsedLog = Bookkeeper__factory.createInterface().parseLog(log);
+  console.log('parsedLog.args.amount', parsedLog.args.amount.toString())
+  const result = await bookkeeperHandler.handleUserAction(
+    parsedLog.args.user,
+    parsedLog.args.amount,
+    parsedLog.args.deposit,
+    receipt
+  );
+  expect(+result.usdValue).is.greaterThan(0);
+}

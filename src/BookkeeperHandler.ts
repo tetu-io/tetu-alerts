@@ -1,7 +1,12 @@
 import {BigNumber, ethers, utils} from "ethers";
 import {DiscordSender} from "./DiscordSender";
 import {Utils} from "./Utils";
-import {ContractReader, SmartVault__factory, Strategy__factory} from "../types/ethers-contracts";
+import {
+  ContractReader,
+  Controller__factory,
+  SmartVault__factory,
+  Strategy__factory
+} from "../types/ethers-contracts";
 import {TransactionReceipt} from "@ethersproject/abstract-provider";
 import {Logger} from "tslog";
 import logSettings from "../log_settings";
@@ -10,8 +15,13 @@ import {Config} from "./Config";
 
 const log: Logger = new Logger(logSettings);
 
-const MIN_REPORT_VALUE = 1000;
+const MIN_USER_ACTION_REPORT_VALUE = 10000;
+const MIN_EARNED_REPORT_VALUE = 10;
 const MAX_ERRORS = 5;
+
+const NOT_VAULT = [
+  '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase()
+]
 
 export class BookkeeperHandler {
 
@@ -44,13 +54,18 @@ export class BookkeeperHandler {
             'txHash': receipt.transactionHash
           }
         }
+        const core = await Utils.getCoreAddresses(this.provider);
+        const controller = Controller__factory.connect(core.controller, this.provider);
         let vaultAdr;
         for (const log of receipt.logs) {
           if (log.topics[0].toLowerCase() === Constants.WITHDRAW_HASH
             || log.topics[0].toLowerCase() === Constants.DEPOSIT_HASH
           ) {
-            vaultAdr = log.address;
-            break;
+            const isVault = await controller.isValidVault(log.address)
+            if (isVault) {
+              vaultAdr = log.address;
+              break;
+            }
           }
         }
         if (!vaultAdr) {
@@ -71,7 +86,7 @@ export class BookkeeperHandler {
         const vaultNamePretty = Utils.formatVaultName(vaultName);
         const usdValue = (amountN * price).toFixed(2);
 
-        if (amountN * price < MIN_REPORT_VALUE) {
+        if (amountN * price < MIN_USER_ACTION_REPORT_VALUE) {
           return {
             'deposit': deposit,
             'vaultNamePretty': vaultNamePretty,
@@ -97,7 +112,7 @@ export class BookkeeperHandler {
           'txHash': receipt.transactionHash
         }
       } catch (e) {
-        log.error('Error in handleUserAction', e);
+        log.error('Error in handleUserAction', receipt.transactionHash, e);
         errorCount++;
         if (errorCount > MAX_ERRORS) {
           return {
@@ -135,7 +150,7 @@ export class BookkeeperHandler {
 
     log.info('STRATEGY EARNED: ', vaultNamePretty, strategyName, amountN, usdAmount);
 
-    if (usdAmount < 1) {
+    if (usdAmount < MIN_EARNED_REPORT_VALUE) {
       return;
     }
 
