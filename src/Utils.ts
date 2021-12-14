@@ -88,6 +88,9 @@ export class Utils {
   }
 
   public static formatVaultName(name: string) {
+    if (name.startsWith('TETU_SWAP_')) {
+      return name;
+    }
     if (name.startsWith('TETU_IRON_LOAN_')) {
       name = name.replace('TETU_IRON_LOAN_', '');
     }
@@ -95,7 +98,7 @@ export class Utils {
       name = name.replace('TETU_AAVE_', '');
     }
     if (name.startsWith('TETU_')) {
-      name = name.replace(/TETU_/g, '')
+      name = name.replace('TETU_', '')
     }
     return name;
   }
