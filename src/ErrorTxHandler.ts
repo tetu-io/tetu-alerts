@@ -43,7 +43,6 @@ export class ErrorTxHandler {
       await tx.wait();
       return false;
     } catch (err) {
-      console.log(err);
       // @ts-ignore
       receipt = err.receipt;
       // @ts-ignore
