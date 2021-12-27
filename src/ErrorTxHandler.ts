@@ -23,9 +23,7 @@ export class ErrorTxHandler {
   }
 
   async handleBlock(block: string, listeningAddresses: Set<string>) {
-    console.log(block);
     const blockData = await this.provider.getBlockWithTransactions(block)
-    console.log(blockData.transactions.length);
     for (let tx of blockData.transactions) {
       await this.handleTx(tx, listeningAddresses);
     }
