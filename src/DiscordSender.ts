@@ -31,7 +31,7 @@ export class DiscordSender {
         color: deposit ? DiscordSender.hexToDecimal("#25a826") : DiscordSender.hexToDecimal("#b32424"),
         fields: [{
           name: vaultName,
-          value: `$${value} User: ${Utils.txHashPrettifyWithLink(sender)}`,
+          value: `$${value} User: ${Utils.addressPrettifyWithLink(sender)}`,
           inline: true,
         }],
       }]
@@ -110,6 +110,24 @@ export class DiscordSender {
     await DiscordSender.send(new Config().importantMessageDiscord, params);
   }
 
+  static async sendError(transactionHash: string, title: string, name: string, message: string) {
+    const params = {
+      username: NAME,
+      avatar_url: AVATAR,
+      embeds: [{
+        title: title,
+        url: Utils.networkScanUrl() + '/tx/' + transactionHash,
+        color: DiscordSender.hexToDecimal("#ba031f"),
+        fields: [{
+          name: name,
+          value: message,
+          inline: true,
+        }],
+      }]
+    }
+    await DiscordSender.send(new Config().errorMessageDiscord, params);
+  }
+
   // *******************************************
 
   private static async send(url: string, params: any) {
@@ -137,5 +155,4 @@ export class DiscordSender {
     }
     return ':exploding_head:';
   }
-
 }

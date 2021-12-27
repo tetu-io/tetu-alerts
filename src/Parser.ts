@@ -10,6 +10,7 @@ import {Utils} from "./Utils";
 import {AnnouncerHandler} from "./AnnouncerHandler";
 import {BookkeeperHandler} from "./BookkeeperHandler";
 import {ControllerHandler} from "./ControllerHandler";
+import {ErrorTxHandler} from "./ErrorTxHandler";
 
 require('dotenv').config();
 
@@ -22,7 +23,7 @@ export class Parser {
     console.log("Network", config.net);
 
 
-    const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
+    const provider = new ethers.providers.WebSocketProvider(config.rpcUrl);
 
     const core = await Utils.getCoreAddresses(provider);
     const tools = await Utils.getToolsAddresses(provider);
@@ -30,10 +31,38 @@ export class Parser {
     const announceHandler = new AnnouncerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const bookkeeperHandler = new BookkeeperHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const controllerHandler = new ControllerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
+    const errorTxHandler = new ErrorTxHandler(provider, ContractReader__factory.connect(tools.reader, provider));
 
-    const announcer = Announcer__factory.connect(core.announcer, provider);
-    const bookkeeper = Bookkeeper__factory.connect(core.bookkeeper, provider);
     const controller = Controller__factory.connect(core.controller, provider);
+    const announcer = Announcer__factory.connect(await controller.announcer(), provider);
+    const bookkeeper = Bookkeeper__factory.connect(await controller.bookkeeper(), provider);
+    const vaultController = Bookkeeper__factory.connect(await controller.vaultController(), provider);
+
+    // ** transactions fails
+    const listeningAddresses = new Set<string>([
+      core.controller.toLowerCase(),
+      announcer.address.toLowerCase(),
+      (await controller.feeRewardForwarder()).toLowerCase(),
+      bookkeeper.address.toLowerCase(),
+      core.notifyHelper.toLowerCase(),
+      (await controller.mintHelper()).toLowerCase(),
+      (await controller.rewardToken()).toLowerCase(),
+      (await controller.fund()).toLowerCase(),
+      vaultController.address.toLowerCase(),
+      core.pawnshop.toLowerCase(),
+      core.swapFactory.toLowerCase(),
+      core.swapRouter.toLowerCase(),
+      core.rewardCalculator.toLowerCase(),
+      core.autoRewarder.toLowerCase()
+    ]);
+    const vaultLength = (await bookkeeper.vaultsLength()).toNumber();
+    for (let i = 0; i < vaultLength; i++) {
+      listeningAddresses.add((await bookkeeper._vaults(i)).toLowerCase());
+    }
+
+    provider.on('block', async (block: string) => {
+      await errorTxHandler.handleBlock(block, listeningAddresses);
+    });
 
 
     // ************** BOOKKEEPER ***********************

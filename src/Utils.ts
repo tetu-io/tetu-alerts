@@ -73,7 +73,6 @@ export class Utils {
 
   public static async getCoreAddresses(provider: ethers.providers.JsonRpcProvider): Promise<CoreAddresses> {
     const net = await provider.getNetwork();
-    console.log('network', net.name);
     const core = Addresses.CORE.get(net.name);
     if (!core) {
       throw Error('No config for ' + net.name);
@@ -83,7 +82,6 @@ export class Utils {
 
   public static async getToolsAddresses(provider: ethers.providers.JsonRpcProvider): Promise<ToolsAddresses> {
     const net = await provider.getNetwork();
-    console.log('network', net.name);
     const tools = Addresses.TOOLS.get(net.name);
     if (!tools) {
       throw Error('No config for ' + net.name);
@@ -132,20 +130,24 @@ export class Utils {
     return Utils.networkScanUrlApi() + `?module=contract&action=getsourcecode&address=${contract}&apikey=${apiKey}`;
   }
 
-  public static txHashPrettify(hash: string) {
+  public static hashPrettify(hash: string) {
     if (!hash || hash.length < 8) {
       return hash;
     }
     return hash.substr(0, 5) + '...' + hash.substr(hash.length - 4)
   }
 
-  public static txHashPrettifyWithLink(hash: string, name?: string) {
-    return `${name ? name + ' ' : ''}[${Utils.txHashPrettify(hash)}](${Utils.networkScanUrl()}/address/${hash})`;
+  public static addressPrettifyWithLink(hash: string, name?: string) {
+    return `${name ? name + ' ' : ''}[${Utils.hashPrettify(hash)}](${Utils.networkScanUrl()}/address/${hash})`;
+  }
+
+  public static txPrettifyWithLink(hash: string, name?: string) {
+    return `${name ? name + ' ' : ''}[${Utils.hashPrettify(hash)}](${Utils.networkScanUrl()}/tx/${hash})`;
   }
 
   public static async txHashPrettifyWithLinkAndVersion(hash: string, provider: ethers.providers.JsonRpcProvider, name?: string) {
     const v = await Utils.tryToGetVersion(hash, provider);
-    return Utils.txHashPrettifyWithLink(hash, name) + ` v${v}`;
+    return Utils.addressPrettifyWithLink(hash, name) + ` v${v}`;
   }
 
   public static async tryToGetVersion(contract: string, provider: ethers.providers.JsonRpcProvider) {

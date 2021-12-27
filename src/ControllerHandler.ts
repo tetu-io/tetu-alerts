@@ -31,7 +31,7 @@ export class ControllerHandler {
   async handleHardWorkerAdded(value: string, receipt: TransactionReceipt) {
     const title = `HardWorker added on ${this.config.net}`;
     const name = `New HardWorker!`;
-    const message = `Address ${Utils.txHashPrettifyWithLink(value)} was added as HardWorker
+    const message = `Address ${Utils.addressPrettifyWithLink(value)} was added as HardWorker
     Now this EOA/contract able to call some non critical functions such as doHardWork()`;
     log.info('handleHardWorkerAdded', title, name, message);
     await DiscordSender.sendImportantMessage(
@@ -47,7 +47,7 @@ export class ControllerHandler {
   async handleHardWorkerRemoved(value: string, receipt: TransactionReceipt) {
     const title = `HardWorker removed on ${this.config.net}`;
     const name = `HardWorker removed`;
-    const message = `Address ${Utils.txHashPrettifyWithLink(value)} was removed from HardWorkers`;
+    const message = `Address ${Utils.addressPrettifyWithLink(value)} was removed from HardWorkers`;
     log.info('handleHardWorkerRemoved', title, name, message);
     await DiscordSender.sendImportantMessage(
       receipt.transactionHash,
@@ -64,11 +64,11 @@ export class ControllerHandler {
     let message: string;
     if (status) {
       name = `Added to WhiteList`;
-      message = `Address ${Utils.txHashPrettifyWithLink(target)} was added to whitelisted
+      message = `Address ${Utils.addressPrettifyWithLink(target)} was added to whitelisted
       Now this contract is able to interact with Tetu vaults. No more privileges`;
     } else {
       name = `Removed from WhiteList`;
-      message = `Address ${Utils.txHashPrettifyWithLink(target)} was removed from whitelisted`;
+      message = `Address ${Utils.addressPrettifyWithLink(target)} was removed from whitelisted`;
     }
     log.info('handleWhiteListStatusChanged', title, name, message);
     await DiscordSender.sendImportantMessage(
@@ -85,8 +85,8 @@ export class ControllerHandler {
     const strategyName = await this.getStrategyName(strategy);
     const title = `Vault with Strategy registered on ${this.config.net}`;
     const name = `New Vault ${vaultName} with strategy ${strategyName}`;
-    const message = `New Vault ${Utils.txHashPrettifyWithLink(vault, vaultName)} v${await Utils.tryToGetVersion(vault, this.provider)}
-     with Strategy ${Utils.txHashPrettifyWithLink(strategy, strategyName)} 
+    const message = `New Vault ${Utils.addressPrettifyWithLink(vault, vaultName)} v${await Utils.tryToGetVersion(vault, this.provider)}
+     with Strategy ${Utils.addressPrettifyWithLink(strategy, strategyName)} 
      v${await Utils.tryToGetVersion(strategy, this.provider)} was registered`;
     log.info('handleVaultAndStrategyAdded', title, name, message);
     await DiscordSender.sendImportantMessage(
@@ -103,7 +103,7 @@ export class ControllerHandler {
     const dec = await Erc20__factory.connect(token, this.provider).decimals();
     const title = `Tokens was transferred from Controller on ${this.config.net}`;
     const name = `Controller token moved`;
-    const message = `${Utils.txHashPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred to ${Utils.txHashPrettifyWithLink(recipient)}`;
+    const message = `${Utils.addressPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred to ${Utils.addressPrettifyWithLink(recipient)}`;
     log.info('handleControllerTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
       receipt.transactionHash,
@@ -119,7 +119,7 @@ export class ControllerHandler {
     const dec = await Erc20__factory.connect(token, this.provider).decimals();
     const title = `Tokens was transferred from Strategy on ${this.config.net}`;
     const name = `Strategy token moved`;
-    const message = `${Utils.txHashPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred from ${Utils.txHashPrettifyWithLink(strategy)}`;
+    const message = `${Utils.addressPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred from ${Utils.addressPrettifyWithLink(strategy)}`;
     log.info('handleStrategyTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
       receipt.transactionHash,
@@ -134,7 +134,7 @@ export class ControllerHandler {
     const tokenName = await Erc20__factory.connect(token, this.provider).symbol();
     const dec = await Erc20__factory.connect(token, this.provider).decimals();
     const title = `Tokens was transferred from FundKeeper on ${this.config.net}`;
-    const name = `${tokenName} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred from ${Utils.txHashPrettifyWithLink(fund)}`;
+    const name = `${tokenName} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred from ${Utils.addressPrettifyWithLink(fund)}`;
     const message = ``;
     log.info('handleFundKeeperTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
@@ -149,7 +149,7 @@ export class ControllerHandler {
   async handleUpdatedAddressSlot(_nameHash: string, oldValue: string, newValue: string, receipt: TransactionReceipt) {
     const title = `Controller Address variable was updated on ${this.config.net}`;
     const name = `Address updated`;
-    const message = `${ControllerHandler.mapNameHashToName(_nameHash)} was updated from ${Utils.txHashPrettifyWithLink(oldValue)} to ${Utils.txHashPrettifyWithLink(newValue)}`;
+    const message = `${ControllerHandler.mapNameHashToName(_nameHash)} was updated from ${Utils.addressPrettifyWithLink(oldValue)} to ${Utils.addressPrettifyWithLink(newValue)}`;
     log.info('handleUpdatedAddressSlot', title, name, message);
     await DiscordSender.sendImportantMessage(
       receipt.transactionHash,
@@ -198,7 +198,7 @@ export class ControllerHandler {
     const pName = await Utils.tryToGetContractName(oldLogic);
     const title = `Proxy upgraded on ${this.config.net}`;
     const name = `${pName} Proxy contract was upgraded`;
-    const message = `${pName} Proxy ${Utils.txHashPrettifyWithLink(target)}\n`
+    const message = `${pName} Proxy ${Utils.addressPrettifyWithLink(target)}\n`
       + `Old logic ${await Utils.txHashPrettifyWithLinkAndVersion(oldLogic, this.provider)}\n`
       + `New logic ${await Utils.txHashPrettifyWithLinkAndVersion(newLogic, this.provider)}`;
     log.info('handleProxyUpgraded', title, name, message);
@@ -233,8 +233,8 @@ export class ControllerHandler {
     const title = `TETU was minted on ${this.config.net}`;
     const name = `Minted ${amountN.toLocaleString('en-US', {maximumFractionDigits: 0})} ${maxAvailable ? '(max available) ' : ' '}TETU tokens`;
     let value = '';
-    value += `To ${Utils.txHashPrettifyWithLink(otherNetworkFund, 'FundKeeper')} ${(amountN * 0.67).toLocaleString('en-US', {maximumFractionDigits: 0})} (67%)\n`;
-    value += `To ${Utils.txHashPrettifyWithLink(distributor, 'Distributor')} ${(amountN * 0.231).toLocaleString('en-US', {maximumFractionDigits: 0})} (23.1%)\n`;
+    value += `To ${Utils.addressPrettifyWithLink(otherNetworkFund, 'FundKeeper')} ${(amountN * 0.67).toLocaleString('en-US', {maximumFractionDigits: 0})} (67%)\n`;
+    value += `To ${Utils.addressPrettifyWithLink(distributor, 'Distributor')} ${(amountN * 0.231).toLocaleString('en-US', {maximumFractionDigits: 0})} (23.1%)\n`;
     value += `To DevFund ${(amountN * 0.099).toLocaleString('en-US', {maximumFractionDigits: 0})} (9.9%)\n`;
 
     log.info('handleMinted', title, name, value);
@@ -250,7 +250,7 @@ export class ControllerHandler {
   async handleDistributorChanged(distributor: string, receipt: TransactionReceipt) {
     const title = `Distributor address was changed on ${this.config.net}`;
     const name = `Reward Distributor was changed`;
-    const message = `${Utils.txHashPrettifyWithLink(distributor, 'New distributor')}`;
+    const message = `${Utils.addressPrettifyWithLink(distributor, 'New distributor')}`;
     log.info('handleDistributorChanged', title, name, message);
     await DiscordSender.sendImportantMessage(
       receipt.transactionHash,
