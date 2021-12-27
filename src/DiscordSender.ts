@@ -1,12 +1,16 @@
 import {Config} from "./Config";
 import axios from "axios";
 import {Utils} from "./Utils";
+import {Logger} from "tslog";
+import logSettings from "../log_settings";
 
 const NAME = 'Tetu Parser';
 const AVATAR = 'https://i.ibb.co/Gcv8DK8/61-Vu-N0-Xdh4-L.jpg';
 const HEADERS = {
   "Content-type": 'application/json'
 }
+
+const log: Logger = new Logger(logSettings);
 
 export class DiscordSender {
 
@@ -15,6 +19,7 @@ export class DiscordSender {
     vaultName: string,
     value: string,
     txHash: string,
+    sender: string,
     network: string,
   ) {
     const params = {
@@ -26,7 +31,7 @@ export class DiscordSender {
         color: deposit ? DiscordSender.hexToDecimal("#25a826") : DiscordSender.hexToDecimal("#b32424"),
         fields: [{
           name: vaultName,
-          value: '$' + value,
+          value: `$${value} User: ${Utils.txHashPrettifyWithLink(sender)}`,
           inline: true,
         }],
       }]
@@ -63,7 +68,7 @@ export class DiscordSender {
     txHash: string,
     titleText: string,
     name: string,
-    value: string,
+    message: string,
   ) {
     const params = {
       username: NAME,
@@ -74,7 +79,7 @@ export class DiscordSender {
         color: DiscordSender.hexToDecimal("#3a3f89"),
         fields: [{
           name: name,
-          value: value,
+          value: message,
           inline: true,
         }],
       }]
@@ -82,12 +87,40 @@ export class DiscordSender {
     await DiscordSender.send(new Config().timeLocksDiscord, params);
   }
 
+  public static async sendImportantMessage(
+    txHash: string,
+    titleText: string,
+    name: string,
+    message: string,
+  ) {
+    const params = {
+      username: NAME,
+      avatar_url: AVATAR,
+      embeds: [{
+        title: titleText,
+        url: Utils.networkScanUrl() + '/tx/' + txHash,
+        color: DiscordSender.hexToDecimal("#912595"),
+        fields: [{
+          name: name,
+          value: message,
+          inline: true,
+        }],
+      }]
+    }
+    await DiscordSender.send(new Config().importantMessageDiscord, params);
+  }
+
   // *******************************************
 
   private static async send(url: string, params: any) {
     if (url && url !== '') {
       const http = axios.create();
-      await http.post(url, params, {headers: HEADERS});
+      try {
+        await http.post(url, params, {headers: HEADERS});
+      } catch (e) {
+        log.error('Error send POST request', url, params);
+        throw e;
+      }
     }
   }
 

@@ -72,7 +72,7 @@ export class BookkeeperHandler {
         const amountN = +utils.formatUnits(amount, dec);
         const price = +utils.formatUnits(await this.reader.getPrice(underlying));
         const vaultNamePretty = Utils.formatVaultName(vaultName);
-        const usdValue = (amountN * price).toFixed(2);
+        const usdValue = (amountN * price).toLocaleString('en-US', {maximumFractionDigits: 0});
 
         if (amountN * price < MIN_USER_ACTION_REPORT_VALUE) {
           return {
@@ -90,13 +90,14 @@ export class BookkeeperHandler {
           vaultNamePretty,
           usdValue,
           receipt.transactionHash,
+          receipt.from,
           this.config.net
         );
 
         return {
           'deposit': deposit,
           'vaultNamePretty': vaultNamePretty,
-          'usdValue': usdValue,
+          'usdValue': amountN * price,
           'txHash': receipt.transactionHash
         }
       } catch (e) {
@@ -145,8 +146,8 @@ export class BookkeeperHandler {
     await DiscordSender.sendStrategyEarned(
       vaultNamePretty,
       strategyName,
-      amountN.toFixed(6),
-      usdAmount.toFixed(6),
+      amountN.toLocaleString('en-US', {maximumFractionDigits: 0}),
+      usdAmount.toLocaleString('en-US', {maximumFractionDigits: 0}),
       receipt.transactionHash,
       this.config.net
     );

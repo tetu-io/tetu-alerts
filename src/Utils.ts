@@ -4,6 +4,10 @@ import {Addresses} from "./addresses/addresses";
 import {ToolsAddresses} from "./addresses/ToolsAddresses";
 import {SpeedUp} from "./SpeedUp";
 import {Config} from "./Config";
+import {SmartVault__factory} from "../types/ethers-contracts";
+import axios from "axios";
+
+let networkScanLastCall = 0;
 
 export class Utils {
 
@@ -129,9 +133,42 @@ export class Utils {
   }
 
   public static txHashPrettify(hash: string) {
-    if (hash.length < 8) {
+    if (!hash || hash.length < 8) {
       return hash;
     }
     return hash.substr(0, 5) + '...' + hash.substr(hash.length - 4)
+  }
+
+  public static txHashPrettifyWithLink(hash: string, name?: string) {
+    return `${name ? name + ' ' : ''}[${Utils.txHashPrettify(hash)}](${Utils.networkScanUrl()}/address/${hash})`;
+  }
+
+  public static async txHashPrettifyWithLinkAndVersion(hash: string, provider: ethers.providers.JsonRpcProvider, name?: string) {
+    const v = await Utils.tryToGetVersion(hash, provider);
+    return Utils.txHashPrettifyWithLink(hash, name) + ` v${v}`;
+  }
+
+  public static async tryToGetVersion(contract: string, provider: ethers.providers.JsonRpcProvider) {
+    try {
+      const v = await SmartVault__factory.connect(contract, provider).VERSION()
+      return v;
+    } catch (e) {
+    }
+    return '0';
+  }
+
+  public static async tryToGetContractName(contract: string) {
+    try {
+      const now = new Date().getTime();
+      if (now - networkScanLastCall < 10_000) {
+        Utils.delay(1000);
+      }
+      const url = Utils.abiScanUrl(contract);
+      const response = await axios.get(url);
+      networkScanLastCall = now;
+      return response.data.result[0].ContractName;
+    } catch (e) {
+    }
+    return 'UNKNOWN_NAME';
   }
 }

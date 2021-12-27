@@ -12,7 +12,6 @@ import {DiscordSender} from "./DiscordSender";
 import {TransactionReceipt} from "@ethersproject/abstract-provider";
 import {Logger} from "tslog";
 import logSettings from "../log_settings";
-import axios from "axios";
 import {Utils} from "./Utils";
 
 const log: Logger = new Logger(logSettings);
@@ -59,7 +58,7 @@ export class AnnouncerHandler {
   public async handleAddressChange(opCode: number, newAddress: string, receipt: TransactionReceipt) {
     const title = `Announce address change on ${this.config.net}`;
     const name = `${OP_CODES.get(opCode)} address will be able to change after 48 hours`;
-    const value = `[New address ${Utils.txHashPrettify(newAddress)}](${Utils.networkScanUrl()}/address/${newAddress})`;
+    const value = Utils.txHashPrettifyWithLink(newAddress, 'New Address');
     log.info('handleAddressChange', title, name, value);
     await DiscordSender.sendAnnounces(
       receipt.transactionHash,
@@ -104,9 +103,9 @@ export class AnnouncerHandler {
     const tokenName = await Erc20__factory.connect(token, this.provider).symbol()
     const title = `Announce token transfer on ${this.config.net}`;
     const name = `${OP_CODES.get(opCode)} will be able to proceed after 48 hours`;
-    const value = `${utils.formatUnits(amount, dec)}`
-      + ` [${tokenName}](${Utils.networkScanUrl()}/address/${token})`
-      + ` will be transferred to [${Utils.txHashPrettify(target)}](${Utils.networkScanUrl()}/address/${target})`;
+    const value = `${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} `
+      + `${Utils.txHashPrettifyWithLink(token, tokenName)}`
+      + ` will be transferred to ${Utils.txHashPrettifyWithLink(target)}`;
     log.info('handleTokenMove', title, name, value);
     await DiscordSender.sendAnnounces(
       receipt.transactionHash,
@@ -119,14 +118,14 @@ export class AnnouncerHandler {
 
   public async handleProxyUpgrade(contract: string, implementation: string, receipt: TransactionReceipt) {
     const curImpl = await Proxy__factory.connect(contract, this.provider).implementation();
-    const ctrName = await AnnouncerHandler.tryToGetContractName(curImpl);
+    const ctrName = await Utils.tryToGetContractName(curImpl);
     const title = `Announce proxy contract upgrade on ${this.config.net}`;
     const name = `${ctrName} Proxy will be able to upgrade after 48 hours`;
-    const value = `Proxy contract [${Utils.txHashPrettify(contract)}](${Utils.networkScanUrl()}/address/${contract})`
-      + ` with current logic [${Utils.txHashPrettify(curImpl)}](${Utils.networkScanUrl()}/address/${curImpl})`
-      + ` v${await this.tryToGetVersion(curImpl)}`
-      + ` will have new logic implementation [${Utils.txHashPrettify(implementation)}](${Utils.networkScanUrl()}/address/${implementation})`
-      + ` v${await this.tryToGetVersion(curImpl)}`;
+    const value = `Proxy contract ${Utils.txHashPrettifyWithLink(contract)}`
+      + ` with current logic ${Utils.txHashPrettifyWithLink(curImpl)}`
+      + ` v${await Utils.tryToGetVersion(curImpl, this.provider)}`
+      + ` will have new logic implementation ${Utils.txHashPrettifyWithLink(implementation)}`
+      + ` v${await Utils.tryToGetVersion(implementation, this.provider)}`;
     log.info('handleProxyUpgrade', title, name, value);
     await DiscordSender.sendAnnounces(
       receipt.transactionHash,
@@ -149,15 +148,15 @@ export class AnnouncerHandler {
       amountN = +utils.formatUnits(toMint);
     }
     const title = `Announce TETU mint`;
-    const name = `Mint ${amountN} ${maxAvailable ? '(max available) ' : ' '}TETU tokens will be able to proceed after 48 hours`;
+    const name = `Mint ${amountN.toLocaleString('en-US', {maximumFractionDigits: 0})} ${maxAvailable ? '(max available) ' : ' '}TETU tokens will be able to proceed after 48 hours`;
 
     let value = '';
     if (maxAvailable) {
       value += 'Will be minted max available tokens at the time of the future call. The following numbers are based on the currently available values.\n';
     }
-    value += `To FundKeeper contract [${Utils.txHashPrettify(distributor)}](${Utils.networkScanUrl()}/address/${distributor}) ${amountN * 0.67} (67%)\n`;
-    value += `To distributor contract [${Utils.txHashPrettify(distributor)}](${Utils.networkScanUrl()}/address/${distributor}) ${amountN * 0.231} (23.1%)\n`;
-    value += `To DevFund [${Utils.txHashPrettify(distributor)}](${Utils.networkScanUrl()}/address/${distributor}) ${amountN * 0.099} (9.9%)\n`;
+    value += `To ${Utils.txHashPrettifyWithLink(otherNetworkFund, 'FundKeeper')} ${(amountN * 0.67).toLocaleString('en-US', {maximumFractionDigits: 0})} (67%)\n`;
+    value += `To ${Utils.txHashPrettifyWithLink(distributor, 'Distributor')} ${(amountN * 0.231).toLocaleString('en-US', {maximumFractionDigits: 0})} (23.1%)\n`;
+    value += `To DevFund ${(amountN * 0.099).toLocaleString('en-US', {maximumFractionDigits: 0})} (9.9%)\n`;
 
     log.info('handleMint', title, name, value);
     await DiscordSender.sendAnnounces(
@@ -212,15 +211,15 @@ export class AnnouncerHandler {
   public async handleStrategyUpgrade(vault: string, strategy: string, receipt: TransactionReceipt) {
     const curStrategy = await SmartVault__factory.connect(vault, this.provider).strategy();
     const vaultName = Utils.formatVaultName(await SmartVault__factory.connect(vault, this.provider).name());
-    const curStrategyName = await AnnouncerHandler.tryToGetContractName(curStrategy);
-    const newStrategyName = await AnnouncerHandler.tryToGetContractName(strategy);
+    const curStrategyName = await Utils.tryToGetContractName(curStrategy);
+    const newStrategyName = await Utils.tryToGetContractName(strategy);
     const title = `Announce strategy upgrade on ${this.config.net}`;
     const name = `${vaultName} vault will be able to upgrade strategy after 48 hours`;
-    const value = `Vault [${vaultName} v${await this.tryToGetVersion(vault)}](${Utils.networkScanUrl()}/address/${vault})`
-      + ` with current strategy ${curStrategyName} [${Utils.txHashPrettify(curStrategy)}](${Utils.networkScanUrl()}/address/${curStrategy})`
-      + ` v${await this.tryToGetVersion(curStrategy)}`
-      + ` will be upgraded to ${newStrategyName} [${Utils.txHashPrettify(strategy)}](${Utils.networkScanUrl()}/address/${strategy})`
-      + ` v${await this.tryToGetVersion(strategy)}`;
+    const value = `Vault [${vaultName} v${await Utils.tryToGetVersion(vault, this.provider)}](${Utils.networkScanUrl()}/address/${vault})`
+      + ` with current strategy ${curStrategyName} [${Utils.txHashPrettifyWithLink(curStrategy)}](${Utils.networkScanUrl()}/address/${curStrategy})`
+      + ` v${await Utils.tryToGetVersion(curStrategy, this.provider)}`
+      + ` will be upgraded to ${newStrategyName} [${Utils.txHashPrettifyWithLink(strategy)}](${Utils.networkScanUrl()}/address/${strategy})`
+      + ` v${await Utils.tryToGetVersion(strategy, this.provider)}`;
     log.info('handleStrategyUpgrade', title, name, value);
     await DiscordSender.sendAnnounces(
       receipt.transactionHash,
@@ -235,7 +234,7 @@ export class AnnouncerHandler {
     const vaultName = Utils.formatVaultName(await SmartVault__factory.connect(vault, this.provider).name());
     const title = `Announce vault stop rewards on ${this.config.net}`;
     const name = `${vaultName} vault will be able to stop rewards after 48 hours`;
-    let value = `[${vaultName} v${await this.tryToGetVersion(vault)}](${Utils.networkScanUrl()}/address/${vault})\n`;
+    let value = `[${vaultName} v${await Utils.tryToGetVersion(vault, this.provider)}](${Utils.networkScanUrl()}/address/${vault})\n`;
     value += `Stop rewards action is critical and will not be able to revert.\n`
     value += `All reward tokens will be moved to Controller contract and users will not able to claim earned rewards.\n`
     value += `It should be called only as part of the migration process and strongly not recommended for normal circumstances`;
@@ -247,25 +246,5 @@ export class AnnouncerHandler {
       value
     );
     return true;
-  }
-
-  // ****************************************************************************
-
-  private async tryToGetVersion(contract: string) {
-    try {
-      return SmartVault__factory.connect(contract, this.provider).VERSION()
-    } catch (e) {
-    }
-    return '0';
-  }
-
-  private static async tryToGetContractName(contract: string) {
-    try {
-      const url = Utils.abiScanUrl(contract);
-      const response = await axios.get(url);
-      return response.data.result[0].ContractName;
-    } catch (e) {
-    }
-    return 'UNKNOWN_NAME';
   }
 }

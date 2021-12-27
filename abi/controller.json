@@ -3,19 +3,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "value",
-        "type": "address"
-      }
-    ],
-    "name": "AddedToWhiteList",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "recipient",
@@ -35,6 +22,19 @@
       }
     ],
     "name": "ControllerTokenMoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "distributor",
+        "type": "address"
+      }
+    ],
+    "name": "DistributorChanged",
     "type": "event"
   },
   {
@@ -94,11 +94,60 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "value",
+        "name": "mintHelper",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "distributor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "otherNetworkFund",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "mintAllAvailable",
+        "type": "bool"
+      }
+    ],
+    "name": "Minted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldLogic",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newLogic",
         "type": "address"
       }
     ],
-    "name": "RemovedFromWhiteList",
+    "name": "ProxyUpgraded",
     "type": "event"
   },
   {
@@ -252,6 +301,50 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldStrategy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newStrategy",
+        "type": "address"
+      }
+    ],
+    "name": "VaultStrategyChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "WhiteListStatusChanged",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "VERSION",
     "outputs": [
@@ -286,50 +379,6 @@
       }
     ],
     "name": "addStrategy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_target",
-        "type": "address"
-      }
-    ],
-    "name": "addToWhiteList",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_targets",
-        "type": "address[]"
-      }
-    ],
-    "name": "addToWhiteListMulti",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_vault",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_strategy",
-        "type": "address"
-      }
-    ],
-    "name": "addVaultAndStrategy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -376,6 +425,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_targets",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "changeWhiteListStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -430,6 +497,19 @@
   {
     "inputs": [],
     "name": "dao",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "distributor",
     "outputs": [
       {
         "internalType": "address",
@@ -597,7 +677,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_governance",
+        "name": "__governance",
         "type": "address"
       }
     ],
@@ -785,16 +865,6 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "_distributor",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_otherNetworkFund",
-        "type": "address"
-      },
-      {
         "internalType": "bool",
         "name": "mintAllAvailable",
         "type": "bool"
@@ -880,32 +950,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_target",
-        "type": "address"
-      }
-    ],
-    "name": "removeFromWhiteList",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_targets",
-        "type": "address[]"
-      }
-    ],
-    "name": "removeFromWhiteListMulti",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "_worker",
         "type": "address"
       }
@@ -964,7 +1008,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_bookkeeper",
+        "name": "newValue",
         "type": "address"
       }
     ],
@@ -977,11 +1021,24 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_dao",
+        "name": "newValue",
         "type": "address"
       }
     ],
     "name": "setDao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_distributor",
+        "type": "address"
+      }
+    ],
+    "name": "setDistributor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1047,7 +1104,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_governance",
+        "name": "newValue",
         "type": "address"
       }
     ],
@@ -1165,24 +1222,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_target",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_strategy",
-        "type": "address"
-      }
-    ],
-    "name": "setVaultStrategy",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address[]",
         "name": "_vaults",
         "type": "address[]"
@@ -1236,24 +1275,6 @@
       }
     ],
     "name": "strategyTokenMove",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_contract",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_implementation",
-        "type": "address"
-      }
-    ],
-    "name": "upgradeTetuProxy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

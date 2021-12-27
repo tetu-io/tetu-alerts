@@ -37,6 +37,7 @@ export class Config {
   userActionDiscord: string;
   strategyEarnedDiscord: string;
   timeLocksDiscord: string;
+  importantMessageDiscord: string;
 
 
   constructor() {
@@ -52,6 +53,7 @@ export class Config {
       this.userActionDiscord = '';
       this.strategyEarnedDiscord = '';
       this.timeLocksDiscord = '';
+      this.importantMessageDiscord = '';
     } else if (this.net === 'matic') {
       this.chain = this.MATIC_CHAIN;
       this.rpcUrl = process.env.MATIC_URL as string;
@@ -59,6 +61,7 @@ export class Config {
       this.userActionDiscord = process.env.MATIC_USER_ACTION_DISCORD as string;
       this.strategyEarnedDiscord = process.env.MATIC_STRATEGY_EARNED_DISCORD as string;
       this.timeLocksDiscord = process.env.MATIC_TIME_LOCKS_DISCORD as string;
+      this.importantMessageDiscord = process.env.MATIC_IMPORTANT_MESSAGE_DISCORD as string;
     } else if (this.net === 'fantom') {
       this.chain = this.FANTOM_CHAIN;
       this.rpcUrl = process.env.FANTOM_URL as string;
@@ -66,6 +69,7 @@ export class Config {
       this.userActionDiscord = process.env.FANTOM_USER_ACTION_DISCORD as string;
       this.strategyEarnedDiscord = process.env.FANTOM_STRATEGY_EARNED_DISCORD as string;
       this.timeLocksDiscord = process.env.FANTOM_TIME_LOCKS_DISCORD as string;
+      this.importantMessageDiscord = process.env.FANTOM_IMPORTANT_MESSAGE_DISCORD as string;
     } else {
       throw Error('Unknown network ' + this.net);
     }

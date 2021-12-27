@@ -3,11 +3,13 @@ import {ethers} from "ethers";
 import {
   Announcer__factory,
   Bookkeeper__factory,
-  ContractReader__factory
+  ContractReader__factory,
+  Controller__factory
 } from "../types/ethers-contracts";
 import {Utils} from "./Utils";
 import {AnnouncerHandler} from "./AnnouncerHandler";
 import {BookkeeperHandler} from "./BookkeeperHandler";
+import {ControllerHandler} from "./ControllerHandler";
 
 require('dotenv').config();
 
@@ -27,9 +29,11 @@ export class Parser {
 
     const announceHandler = new AnnouncerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const bookkeeperHandler = new BookkeeperHandler(provider, ContractReader__factory.connect(tools.reader, provider));
+    const controllerHandler = new ControllerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
 
     const announcer = Announcer__factory.connect(core.announcer, provider);
     const bookkeeper = Bookkeeper__factory.connect(core.bookkeeper, provider);
+    const controller = Controller__factory.connect(core.controller, provider);
 
 
     // ************** BOOKKEEPER ***********************
@@ -68,6 +72,49 @@ export class Parser {
     announcer.on(announcer.filters.VaultStop(), async (vault, event) => {
       await announceHandler.handleVaultStop(vault, await event.getTransactionReceipt());
     });
+
+    // ***************** controller
+    controller.on(controller.filters.HardWorkerAdded(), async (value, event) => {
+      await controllerHandler.handleHardWorkerAdded(value, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.HardWorkerRemoved(), async (value, event) => {
+      await controllerHandler.handleHardWorkerRemoved(value, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.WhiteListStatusChanged(), async (target, status, event) => {
+      await controllerHandler.handleWhiteListStatusChanged(target, status, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.VaultAndStrategyAdded(), async (vault, strategy, event) => {
+      await controllerHandler.handleVaultAndStrategyAdded(vault, strategy, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.ControllerTokenMoved(), async (recipient, token, amount, event) => {
+      await controllerHandler.handleControllerTokenMoved(recipient, token, amount, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.StrategyTokenMoved(), async (strategy, token, amount, event) => {
+      await controllerHandler.handleStrategyTokenMoved(strategy, token, amount, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.FundKeeperTokenMoved(), async (fund, token, amount, event) => {
+      await controllerHandler.handleFundKeeperTokenMoved(fund, token, amount, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.UpdatedAddressSlot(), async (name, oldValue, newValue, event) => {
+      await controllerHandler.handleUpdatedAddressSlot(name, oldValue, newValue, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.UpdatedUint256Slot(), async (name, oldValue, newValue, event) => {
+      await controllerHandler.handleUpdatedUint256Slot(name, oldValue, newValue, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.VaultStrategyChanged(), async (vault, oldStrategy, newStrategy, event) => {
+      await controllerHandler.handleVaultStrategyChanged(vault, oldStrategy, newStrategy, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.ProxyUpgraded(), async (target, oldLogic, newLogic, event) => {
+      await controllerHandler.handleProxyUpgraded(target, oldLogic, newLogic, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.Minted(), async (mintHelper, totalAmount, distributor, otherNetworkFund, mintAllAvailable, event) => {
+      await controllerHandler.handleMinted(mintHelper, totalAmount, distributor, otherNetworkFund, mintAllAvailable, await event.getTransactionReceipt());
+    });
+    controller.on(controller.filters.DistributorChanged(), async (distributor, event) => {
+      await controllerHandler.handleDistributorChanged(distributor, await event.getTransactionReceipt());
+    });
+
+    // ** vault controller
   }
 
 }

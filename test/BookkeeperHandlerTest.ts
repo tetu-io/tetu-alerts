@@ -2,10 +2,11 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import {BookkeeperHandler} from "../src/BookkeeperHandler";
 import {Config} from "../src/Config";
-import {ethers, utils} from "ethers";
+import {ethers} from "ethers";
 import {Utils} from "../src/Utils";
 import {Bookkeeper__factory, ContractReader__factory} from "../types/ethers-contracts";
 import {Constants} from "../src/Constants";
+import {TransactionReceipt} from "@ethersproject/abstract-provider";
 
 require('dotenv').config();
 const {expect} = chai;
@@ -30,6 +31,18 @@ describe("BookkeeperHandlerTest", function () {
 
   it("handleUserAction MATIC DEPOSIT test", async () => {
     await check('0x64726c79bf3b097fc32bbe38619e65b29756a4a870d858b4a0e5a1371ed0cfc7', provider, bookkeeperHandler);
+  });
+
+  it("handleStrategyEarned", async () => {
+    const hash = '0xf901c9322a9ad373fc0f8f0ffeb4acbdce92104fa256d377a1280d21e9a5d515';
+    const receipt = await provider.getTransactionReceipt(hash);
+    let log = getLog(receipt, Constants.REGISTER_STRATEGY_EARNED_HASH);
+    const logParsed = Bookkeeper__factory.createInterface().parseLog(log);
+    await bookkeeperHandler.handleStrategyEarned(
+      logParsed.args.strategy,
+      logParsed.args.amount,
+      receipt
+    );
   });
 
 });
@@ -58,4 +71,19 @@ async function check(hash: string, provider: ethers.providers.JsonRpcProvider, b
     receipt
   );
   expect(+result.usdValue).is.greaterThan(0);
+}
+
+function getLog(receipt: TransactionReceipt, hash: string) {
+  let log = null;
+  for (const l of receipt.logs) {
+    if (l.topics[0].toLowerCase() === hash) {
+      log = l;
+      break;
+    }
+  }
+  expect(log !== null).is.eq(true);
+  if (log === null) {
+    throw Error();
+  }
+  return log;
 }
