@@ -57,7 +57,7 @@ export class ErrorTxHandler {
     const title = `Error  on ${this.config.net}`;
     const name = `${contractName} error: ${reason}`;
     const message = `From ${Utils.txPrettifyWithLink(tx.from)} to ${Utils.txPrettifyWithLink(tx.to as string)}`;
-    log.info('handleRatioChange', title, name, message);
+    log.info('handleTx', title, name, message);
     await DiscordSender.sendError(
       receipt.transactionHash,
       title,
