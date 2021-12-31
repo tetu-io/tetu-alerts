@@ -73,18 +73,18 @@ export class Utils {
 
   public static async getCoreAddresses(provider: ethers.providers.JsonRpcProvider): Promise<CoreAddresses> {
     const net = await provider.getNetwork();
-    const core = Addresses.CORE.get(net.name);
+    const core = Addresses.CORE.get(net.chainId + '');
     if (!core) {
-      throw Error('No config for ' + net.name);
+      throw Error('No config for ' + net.chainId);
     }
     return core;
   }
 
   public static async getToolsAddresses(provider: ethers.providers.JsonRpcProvider): Promise<ToolsAddresses> {
     const net = await provider.getNetwork();
-    const tools = Addresses.TOOLS.get(net.name);
+    const tools = Addresses.TOOLS.get(net.chainId + '');
     if (!tools) {
-      throw Error('No config for ' + net.name);
+      throw Error('No config for ' + net.chainId);
     }
     return tools;
   }

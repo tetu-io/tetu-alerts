@@ -4,17 +4,21 @@ import {MaticToolsAddresses} from "./addresses_tools_matic";
 import {RinkebyToolsAddresses} from "./addresses_tools_rinkeby";
 import {CoreAddresses} from "./CoreAddresses";
 import {ToolsAddresses} from "./ToolsAddresses";
+import {FtmCoreAddresses} from "./addresses_core_ftm";
+import {FtmToolsAddresses} from "./addresses_tools_ftm";
 
 export class Addresses {
 
   public static CORE = new Map<string, CoreAddresses>([
-    ['matic', MaticCoreAddresses.ADDRESSES],
-    ['rinkeby', RinkebyCoreAddress.ADDRESSES]
+    ['137', MaticCoreAddresses.ADDRESSES],
+    ['250', FtmCoreAddresses.ADDRESSES],
+    ['4', RinkebyCoreAddress.ADDRESSES]
   ]);
 
   public static TOOLS = new Map<string, ToolsAddresses>([
-    ['matic', MaticToolsAddresses.ADDRESSES],
-    ['rinkeby', RinkebyToolsAddresses.ADDRESSES]
+    ['137', MaticToolsAddresses.ADDRESSES],
+    ['250', FtmToolsAddresses.ADDRESSES],
+    ['4', RinkebyToolsAddresses.ADDRESSES]
   ]);
 
   public static TOKENS = new Map<string, Map<string, string>>([
