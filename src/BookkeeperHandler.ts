@@ -45,12 +45,12 @@ export class BookkeeperHandler {
     while (true) {
       try {
         if (!receipt?.status) {
-          log.error('handleUserAction Wrong status', receipt.transactionHash)
+          log.error('handleUserAction Wrong status', receipt?.transactionHash)
           return {
             'deposit': deposit,
             'vaultNamePretty': 'WRONG STATUS',
             'usdValue': '0',
-            'txHash': receipt.transactionHash
+            'txHash': receipt?.transactionHash
           }
         }
         const core = await Utils.getCoreAddresses(this.provider);
@@ -62,7 +62,7 @@ export class BookkeeperHandler {
             'deposit': deposit,
             'vaultNamePretty': 'NOT DIRECT CALL ON VAULT',
             'usdValue': '0',
-            'txHash': receipt.transactionHash
+            'txHash': receipt?.transactionHash
           }
         }
         const vaultCtr = SmartVault__factory.connect(vaultAdr, this.provider);
@@ -79,17 +79,17 @@ export class BookkeeperHandler {
             'deposit': deposit,
             'vaultNamePretty': vaultNamePretty,
             'usdValue': usdValue,
-            'txHash': receipt.transactionHash
+            'txHash': receipt?.transactionHash
           }
         }
 
-        log.info('USER ACTION: ', vaultNamePretty, deposit, usdValue, receipt.transactionHash);
+        log.info('USER ACTION: ', vaultNamePretty, deposit, usdValue, receipt?.transactionHash);
 
         await DiscordSender.sendUserAction(
           deposit,
           vaultNamePretty,
           usdValue,
-          receipt.transactionHash,
+          receipt?.transactionHash,
           receipt.from,
           this.config.net
         );
@@ -98,10 +98,10 @@ export class BookkeeperHandler {
           'deposit': deposit,
           'vaultNamePretty': vaultNamePretty,
           'usdValue': amountN * price,
-          'txHash': receipt.transactionHash
+          'txHash': receipt?.transactionHash
         }
       } catch (e) {
-        log.error('Error in handleUserAction', receipt.transactionHash, e);
+        log.error('Error in handleUserAction', receipt?.transactionHash, e);
         errorCount++;
         if (errorCount > MAX_ERRORS) {
           return {
@@ -122,7 +122,7 @@ export class BookkeeperHandler {
     receipt: TransactionReceipt
   ) {
     if (!receipt?.status) {
-      log.error('handleStrategyEarned Wrong status', receipt.transactionHash)
+      log.error('handleStrategyEarned Wrong status', receipt?.transactionHash)
       return;
     }
     const core = await Utils.getCoreAddresses(this.provider);
@@ -148,7 +148,7 @@ export class BookkeeperHandler {
       strategyName,
       amountN.toLocaleString('en-US', {maximumFractionDigits: 0}),
       usdAmount.toLocaleString('en-US', {maximumFractionDigits: 0}),
-      receipt.transactionHash,
+      receipt?.transactionHash,
       this.config.net
     );
   }

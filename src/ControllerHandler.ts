@@ -35,7 +35,7 @@ export class ControllerHandler {
     Now this EOA/contract able to call some non critical functions such as doHardWork()`;
     log.info('handleHardWorkerAdded', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -50,7 +50,7 @@ export class ControllerHandler {
     const message = `Address ${Utils.addressPrettifyWithLink(value)} was removed from HardWorkers`;
     log.info('handleHardWorkerRemoved', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -72,7 +72,7 @@ export class ControllerHandler {
     }
     log.info('handleWhiteListStatusChanged', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -90,7 +90,7 @@ export class ControllerHandler {
      v${await Utils.tryToGetVersion(strategy, this.provider)} was registered`;
     log.info('handleVaultAndStrategyAdded', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -106,7 +106,7 @@ export class ControllerHandler {
     const message = `${Utils.addressPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred to ${Utils.addressPrettifyWithLink(recipient)}`;
     log.info('handleControllerTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -122,7 +122,7 @@ export class ControllerHandler {
     const message = `${Utils.addressPrettifyWithLink(token, tokenName)} ${parseFloat(utils.formatUnits(amount, dec)).toLocaleString('en-US', {maximumFractionDigits: 0})} was transferred from ${Utils.addressPrettifyWithLink(strategy)}`;
     log.info('handleStrategyTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -138,7 +138,7 @@ export class ControllerHandler {
     const message = ``;
     log.info('handleFundKeeperTokenMoved', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -152,7 +152,7 @@ export class ControllerHandler {
     const message = `${ControllerHandler.mapNameHashToName(_nameHash)} was updated from ${Utils.addressPrettifyWithLink(oldValue)} to ${Utils.addressPrettifyWithLink(newValue)}`;
     log.info('handleUpdatedAddressSlot', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -166,7 +166,7 @@ export class ControllerHandler {
     const message = `${ControllerHandler.mapNameHashToName(_nameHash)} was updated from ${oldValue.toString()} to ${newValue.toString()}`;
     log.info('handleUpdatedUint256Slot', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -186,7 +186,7 @@ export class ControllerHandler {
       + `New strategy ${await Utils.txHashPrettifyWithLinkAndVersion(newStrategy, this.provider, newStrategyName)}\n`;
     log.info('handleVaultStrategyChanged', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -203,7 +203,7 @@ export class ControllerHandler {
       + `New logic ${await Utils.txHashPrettifyWithLinkAndVersion(newLogic, this.provider)}`;
     log.info('handleProxyUpgraded', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message
@@ -239,7 +239,7 @@ export class ControllerHandler {
 
     log.info('handleMinted', title, name, value);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -253,7 +253,7 @@ export class ControllerHandler {
     const message = `${Utils.addressPrettifyWithLink(distributor, 'New distributor')}`;
     log.info('handleDistributorChanged', title, name, message);
     await DiscordSender.sendImportantMessage(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       message

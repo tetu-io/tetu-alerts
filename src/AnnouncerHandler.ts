@@ -62,7 +62,7 @@ export class AnnouncerHandler {
     const value = Utils.addressPrettifyWithLink(newAddress, 'New Address');
     log.info('handleAddressChange', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -76,7 +76,7 @@ export class AnnouncerHandler {
     const value = `New value is ${newValue.toString()}`;
     log.info('handleUintChange', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -91,7 +91,7 @@ export class AnnouncerHandler {
     const value = `New ratio is ${ratio.toString()}`;
     log.info('handleRatioChange', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -109,7 +109,7 @@ export class AnnouncerHandler {
       + ` will be transferred to ${Utils.addressPrettifyWithLink(target)}`;
     log.info('handleTokenMove', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -129,7 +129,7 @@ export class AnnouncerHandler {
       + ` v${await Utils.tryToGetVersion(implementation, this.provider)}`;
     log.info('handleProxyUpgrade', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -161,7 +161,7 @@ export class AnnouncerHandler {
 
     log.info('handleMint', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -189,7 +189,7 @@ export class AnnouncerHandler {
       }
     }
     if (!targetInfo) {
-      log.error('Announce not found!', receipt.transactionHash);
+      log.error('Announce not found!', receipt?.transactionHash);
       return false;
     }
 
@@ -201,7 +201,7 @@ export class AnnouncerHandler {
     value += `Number values was ${targetInfo.numValues}\n`;
     log.info('handleClose', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -223,7 +223,7 @@ export class AnnouncerHandler {
       + ` v${await Utils.tryToGetVersion(strategy, this.provider)}`;
     log.info('handleStrategyUpgrade', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
@@ -241,7 +241,7 @@ export class AnnouncerHandler {
     value += `It should be called only as part of the migration process and strongly not recommended for normal circumstances`;
     log.info('handleVaultStop', title, name, value);
     await DiscordSender.sendAnnounces(
-      receipt.transactionHash,
+      receipt?.transactionHash,
       title,
       name,
       value
