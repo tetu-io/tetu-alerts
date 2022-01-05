@@ -44,7 +44,7 @@ export class BookkeeperHandler {
     let errorCount = 0;
     while (true) {
       try {
-        if (!receipt.status) {
+        if (!receipt?.status) {
           log.error('handleUserAction Wrong status', receipt.transactionHash)
           return {
             'deposit': deposit,
@@ -121,7 +121,7 @@ export class BookkeeperHandler {
     amount: BigNumber,
     receipt: TransactionReceipt
   ) {
-    if (!receipt.status) {
+    if (!receipt?.status) {
       log.error('handleStrategyEarned Wrong status', receipt.transactionHash)
       return;
     }
