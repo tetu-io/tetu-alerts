@@ -173,4 +173,26 @@ export class Utils {
     }
     return 'UNKNOWN_NAME';
   }
+
+  public static tryToResolveName(adr: string) {
+    const address = adr.toLowerCase();
+
+    if(address === "0xcc16d636dD05b52FF1D8B9CE09B09BC62b11412B".toLowerCase() || address === "0x11d946C4Df8222940F9e7e6E56042Be2832B0871".toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'Governance msig');
+    } else if(address === '0x424198579844b0d6f13c3a6B83b9Cf987af9C545'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'HardWorker#2');
+    } else if(address === '0xADC31a85C01aeBA202Df01adc392a7c6b8D56916'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'HardWorker#3');
+    } else if(address === '0x9880888C8768f4507bD5793E37470343dBBfF3B6'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'HardWorker#4');
+    } else if(address === '0x75766Be51F932E738dee52f3A46c394589A36233'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'HardWorker#5');
+    } else if(address === '0xb70CF120fb4461F77bbB189b125131e3D5234266'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'HardWorker#1');
+    } else if(address === '0xbbbbb8C4364eC2ce52c59D2Ed3E56F307E529a94'.toLowerCase()) {
+      return Utils.txPrettifyWithLink(adr, 'Tetu Deployer');
+    }
+
+    return Utils.txPrettifyWithLink(adr);
+  }
 }

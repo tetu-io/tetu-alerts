@@ -43,10 +43,22 @@ export class ErrorTxHandler {
       await tx.wait();
       return false;
     } catch (err) {
+      // console.error(err);
+      const transaction = await this.provider.call({
+        gasPrice: tx.gasPrice,
+        gasLimit: tx.gasLimit,
+        value: tx.value,
+        to: tx.to,
+        from: tx.from,
+        nonce: tx.nonce,
+        data: tx.data,
+        chainId: tx.chainId,
+        maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+        maxFeePerGas: tx.maxFeePerGas,
+      }, tx.blockNumber);
+      reason = decodeMessage(transaction)
       // @ts-ignore
       receipt = err.receipt;
-      // @ts-ignore
-      reason = err.reason;
     }
     if (receipt.status === 1) {
       return false;
@@ -56,7 +68,7 @@ export class ErrorTxHandler {
 
     const title = `Error  on ${this.config.net}`;
     const name = `${contractName} error: ${reason}`;
-    const message = `From ${Utils.txPrettifyWithLink(tx.from)} to ${Utils.txPrettifyWithLink(tx.to as string)}`;
+    const message = `From ${Utils.tryToResolveName(tx.from)} to ${Utils.tryToResolveName(tx.to as string)}`;
     log.info('handleTx', title, name, message);
     await DiscordSender.sendError(
       receipt.transactionHash,
@@ -66,4 +78,21 @@ export class ErrorTxHandler {
     );
     return true;
   }
+}
+
+function decodeMessage(code: string) {
+  let codeString
+  const fnSelectorByteLength = 4
+  const dataOffsetByteLength = 32
+  const strLengthByteLength = 32
+  const strLengthStartPos = 2 + ((fnSelectorByteLength + dataOffsetByteLength) * 2)
+  const strDataStartPos = 2 + ((fnSelectorByteLength + dataOffsetByteLength + strLengthByteLength) * 2)
+  codeString = `0x${code.substr(138)}`.replace(/0+$/, '')
+  // If the codeString is an odd number of characters, add a trailing 0
+  if (codeString.length % 2 === 1) {
+    codeString += '0'
+  }
+
+  return ethers.utils.toUtf8String(codeString)
+
 }
