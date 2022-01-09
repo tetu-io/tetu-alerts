@@ -53,6 +53,14 @@ export class BookkeeperHandler {
             'txHash': receipt?.transactionHash
           }
         }
+        if (user.toLowerCase() !== receipt.from) {
+          return {
+            'deposit': deposit,
+            'vaultNamePretty': 'INTERNAL ACTION',
+            'usdValue': '0',
+            'txHash': receipt?.transactionHash
+          }
+        }
         const core = await Utils.getCoreAddresses(this.provider);
         const controller = Controller__factory.connect(core.controller, this.provider);
         let vaultAdr = receipt.to;

@@ -33,6 +33,10 @@ describe("BookkeeperHandlerTest", function () {
     await check('0x64726c79bf3b097fc32bbe38619e65b29756a4a870d858b4a0e5a1371ed0cfc7', provider, bookkeeperHandler);
   });
 
+  it("handleUserAction KLIMA DEPOSIT test should not handle internal action", async () => {
+    await check('0x56f6619b06d016f16fbdac830d8496db1cea78e3d947a59fa8a58a9b33765f81', provider, bookkeeperHandler, 2, false);
+  });
+
   it("handleStrategyEarned", async () => {
     const hash = '0xf901c9322a9ad373fc0f8f0ffeb4acbdce92104fa256d377a1280d21e9a5d515';
     const receipt = await provider.getTransactionReceipt(hash);
@@ -48,13 +52,22 @@ describe("BookkeeperHandlerTest", function () {
 });
 
 
-async function check(hash: string, provider: ethers.providers.JsonRpcProvider, bookkeeperHandler: BookkeeperHandler) {
+async function check(
+  hash: string,
+  provider: ethers.providers.JsonRpcProvider,
+  bookkeeperHandler: BookkeeperHandler,
+  logCount = 1,
+  shouldPass = true) {
   const receipt = await provider.getTransactionReceipt(hash);
   let log = null;
+  let count = 0;
   for (const l of receipt.logs) {
     if (l.topics[0].toLowerCase() === Constants.USER_ACTION_HASH) {
       log = l;
-      break;
+      count++;
+      if(logCount === count) {
+        break;
+      }
     }
   }
   expect(log !== null).is.eq(true);
@@ -70,7 +83,11 @@ async function check(hash: string, provider: ethers.providers.JsonRpcProvider, b
     parsedLog.args.deposit,
     receipt
   );
-  expect(+result.usdValue).is.greaterThan(0);
+  if(shouldPass) {
+    expect(+result.usdValue).is.greaterThan(0);
+  } else {
+    expect(+result.usdValue).is.eq(0);
+  }
 }
 
 function getLog(receipt: TransactionReceipt, hash: string) {
