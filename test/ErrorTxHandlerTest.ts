@@ -33,6 +33,16 @@ describe("ErrorTxHandlerTest", function () {
     await errorTxHandler.handleTx(tx, targets);
   });
 
+  it("handleTx ftm", async () => {
+    const config = new Config('fantom');
+    const providerFtm = new ethers.providers.JsonRpcProvider(config.rpcUrl);
+    const tools = await Utils.getToolsAddresses(providerFtm);
+    const errorTxHandlerFtm = new ErrorTxHandler(providerFtm, ContractReader__factory.connect(tools.reader, providerFtm));
+    const targets = new Set<string>(['0x63290e79760e441e9228c5308e8ff7de50843c20'.toLowerCase()]);
+    const hash = '0x2e75169b0814bd1d28aee8fff293e7fa9afcf14dd7a742a028fbeae9fffe8f3c';
+    const tx = await providerFtm.getTransaction(hash);
+    await errorTxHandlerFtm.handleTx(tx, targets);
+  });
 });
 
 

@@ -56,7 +56,7 @@ export class ErrorTxHandler {
         maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
         maxFeePerGas: tx.maxFeePerGas,
       }, tx.blockNumber);
-      reason = decodeMessage(transaction)
+      reason = decodeMessage(transaction);
       // @ts-ignore
       receipt = err.receipt;
     }

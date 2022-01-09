@@ -41,11 +41,14 @@ export class Config {
   errorMessageDiscord: string;
 
 
-  constructor() {
-
-
+  constructor(net?: string | null) {
     this.privateKey = process.env.SIGNER_KEY as string;
-    this.net = process.env.NET as string;
+    if (!net) {
+      this.net = process.env.NET as string;
+    } else {
+      this.net = net as string;
+    }
+
 
     if (this.net === 'rinkeby') {
       this.chain = this.RINKEBY_CHAIN;
