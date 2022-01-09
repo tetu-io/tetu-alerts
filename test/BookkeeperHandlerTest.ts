@@ -74,14 +74,14 @@ async function check(
   if (!log) {
     return;
   }
-
   const parsedLog = Bookkeeper__factory.createInterface().parseLog(log);
+
   console.log('parsedLog.args.amount', parsedLog.args.amount.toString())
   const result = await bookkeeperHandler.handleUserAction(
     parsedLog.args.user,
     parsedLog.args.amount,
     parsedLog.args.deposit,
-    receipt
+    hash
   );
   if(shouldPass) {
     expect(+result.usdValue).is.greaterThan(0);

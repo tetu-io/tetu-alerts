@@ -67,7 +67,7 @@ export class Parser {
 
     // ************** BOOKKEEPER ***********************
     bookkeeper.on(bookkeeper.filters.RegisterUserAction(), async (user, amount, deposit, event) => {
-      await bookkeeperHandler.handleUserAction(user, amount, deposit, await event.getTransactionReceipt());
+      await bookkeeperHandler.handleUserAction(user, amount, deposit, event.transactionHash);
     });
     bookkeeper.on(bookkeeper.filters.RegisterStrategyEarned(), async (strategy, amount, event) => {
       await bookkeeperHandler.handleStrategyEarned(strategy, amount, await event.getTransactionReceipt());

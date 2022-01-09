@@ -2,6 +2,7 @@ import {BigNumber, ethers, utils} from "ethers";
 import {DiscordSender} from "./DiscordSender";
 import {Utils} from "./Utils";
 import {
+  Bookkeeper, Bookkeeper__factory,
   ContractReader,
   Controller__factory,
   SmartVault__factory,
@@ -11,6 +12,9 @@ import {TransactionReceipt} from "@ethersproject/abstract-provider";
 import {Logger} from "tslog";
 import logSettings from "../log_settings";
 import {Config} from "./Config";
+import {EventFragment} from "@ethersproject/abi";
+import {RegisterUserActionEvent} from "../types/ethers-contracts/Bookkeeper";
+import {TypedEvent} from "../types/ethers-contracts/common";
 
 const log: Logger = new Logger(logSettings);
 
@@ -39,13 +43,28 @@ export class BookkeeperHandler {
     user: string,
     amount: BigNumber,
     deposit: boolean,
-    receipt: TransactionReceipt
+    transactionHash: string
   ) {
     let errorCount = 0;
     while (true) {
       try {
-        if (!receipt?.status) {
-          log.error('handleUserAction Wrong status', receipt?.transactionHash)
+        const receipt = await this.provider.getTransactionReceipt(transactionHash);
+        if(!receipt) {
+          console.log('Empty receipt for', transactionHash);
+          Utils.delay(10000);
+          errorCount++;
+          if (errorCount > MAX_ERRORS) {
+            return {
+              'deposit': deposit,
+              'vaultNamePretty': 'MAX RETRY',
+              'usdValue': '0',
+              'txHash': ''
+            }
+          }
+          continue;
+        }
+        if (!receipt.status) {
+          log.error('handleUserAction Wrong status', receipt.transactionHash)
           return {
             'deposit': deposit,
             'vaultNamePretty': 'WRONG STATUS',
@@ -53,7 +72,7 @@ export class BookkeeperHandler {
             'txHash': receipt?.transactionHash
           }
         }
-        if (user.toLowerCase() !== receipt.from) {
+        if (user.toLowerCase() !== receipt.from.toLowerCase()) {
           return {
             'deposit': deposit,
             'vaultNamePretty': 'INTERNAL ACTION',
@@ -109,7 +128,7 @@ export class BookkeeperHandler {
           'txHash': receipt?.transactionHash
         }
       } catch (e) {
-        log.error('Error in handleUserAction', receipt?.transactionHash, e);
+        log.error('Error in handleUserAction', transactionHash, e);
         errorCount++;
         if (errorCount > MAX_ERRORS) {
           return {
