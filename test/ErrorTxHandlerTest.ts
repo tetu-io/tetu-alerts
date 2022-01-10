@@ -32,6 +32,12 @@ describe("ErrorTxHandlerTest", function () {
     const tx = await provider.getTransaction(hash);
     await errorTxHandler.handleTx(tx, targets);
   });
+  it("handleTx2", async () => {
+    const targets = new Set<string>(['0x6678814c273d5088114b6e40cc49c8db04f9bc29'.toLowerCase()]);
+    const hash = '0x2b42af0d1f2feae1ab49f496f7806173e65982bf026e0590298a1fc465fbd858';
+    const tx = await provider.getTransaction(hash);
+    await errorTxHandler.handleTx(tx, targets);
+  });
 
   it("handleTx ftm", async () => {
     const config = new Config('fantom');
@@ -66,7 +72,7 @@ async function check(hash: string, provider: ethers.providers.JsonRpcProvider, b
     parsedLog.args.user,
     parsedLog.args.amount,
     parsedLog.args.deposit,
-    receipt
+    receipt.transactionHash
   );
   expect(+result.usdValue).is.greaterThan(0);
 }

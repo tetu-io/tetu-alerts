@@ -44,21 +44,26 @@ export class ErrorTxHandler {
       return false;
     } catch (err) {
       // console.error(err);
-      const transaction = await this.provider.call({
-        gasPrice: tx.gasPrice,
-        gasLimit: tx.gasLimit,
-        value: tx.value,
-        to: tx.to,
-        from: tx.from,
-        nonce: tx.nonce,
-        data: tx.data,
-        chainId: tx.chainId,
-        maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-        maxFeePerGas: tx.maxFeePerGas,
-      }, tx.blockNumber);
-      reason = decodeMessage(transaction);
-      // @ts-ignore
-      receipt = err.receipt;
+      try {
+        const transaction = await this.provider.call({
+          gasPrice: tx.gasPrice,
+          gasLimit: tx.gasLimit,
+          value: tx.value,
+          to: tx.to,
+          from: tx.from,
+          nonce: tx.nonce,
+          data: tx.data,
+          chainId: tx.chainId,
+          maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+          maxFeePerGas: tx.maxFeePerGas,
+        }, tx.blockNumber);
+        reason = decodeMessage(transaction);
+        // @ts-ignore
+        receipt = err.receipt;
+      } catch (e) {
+        console.log('Error decode error', tx.hash, e);
+        return false;
+      }
     }
     if (receipt.status === 1) {
       return false;
