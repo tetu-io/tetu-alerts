@@ -23,20 +23,21 @@ export class Parser {
     console.log("Network", config.net);
 
 
-    const provider = new ethers.providers.WebSocketProvider(config.rpcUrl);
+    const providerWs = new ethers.providers.WebSocketProvider(config.rpcUrlWs);
+    const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
 
-    const core = await Utils.getCoreAddresses(provider);
-    const tools = await Utils.getToolsAddresses(provider);
+    const core = await Utils.getCoreAddresses(providerWs);
+    const tools = await Utils.getToolsAddresses(providerWs);
 
-    const announceHandler = new AnnouncerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
-    const bookkeeperHandler = new BookkeeperHandler(provider, ContractReader__factory.connect(tools.reader, provider));
-    const controllerHandler = new ControllerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
-    const errorTxHandler = new ErrorTxHandler(provider, ContractReader__factory.connect(tools.reader, provider));
+    const announceHandler = new AnnouncerHandler(providerWs, ContractReader__factory.connect(tools.reader, providerWs));
+    const bookkeeperHandler = new BookkeeperHandler(providerWs, ContractReader__factory.connect(tools.reader, provider));
+    const controllerHandler = new ControllerHandler(providerWs, ContractReader__factory.connect(tools.reader, providerWs));
+    const errorTxHandler = new ErrorTxHandler(providerWs, ContractReader__factory.connect(tools.reader, providerWs));
 
-    const controller = Controller__factory.connect(core.controller, provider);
-    const announcer = Announcer__factory.connect(await controller.announcer(), provider);
-    const bookkeeper = Bookkeeper__factory.connect(await controller.bookkeeper(), provider);
-    const vaultController = Bookkeeper__factory.connect(await controller.vaultController(), provider);
+    const controller = Controller__factory.connect(core.controller, providerWs);
+    const announcer = Announcer__factory.connect(await controller.announcer(), providerWs);
+    const bookkeeper = Bookkeeper__factory.connect(await controller.bookkeeper(), providerWs);
+    const vaultController = Bookkeeper__factory.connect(await controller.vaultController(), providerWs);
 
     // ** transactions fails
     const listeningAddresses = new Set<string>([
@@ -60,7 +61,7 @@ export class Parser {
       listeningAddresses.add((await bookkeeper._vaults(i)).toLowerCase());
     }
 
-    provider.on('block', async (block: string) => {
+    providerWs.on('block', async (block: string) => {
       await errorTxHandler.handleBlock(block, listeningAddresses);
     });
 

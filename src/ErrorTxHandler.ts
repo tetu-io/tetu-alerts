@@ -45,6 +45,8 @@ export class ErrorTxHandler {
     } catch (err) {
       // console.error(err);
       try {
+        // @ts-ignore
+        receipt = err.receipt;
         const transaction = await this.provider.call({
           gasPrice: tx.gasPrice,
           gasLimit: tx.gasLimit,
@@ -58,11 +60,9 @@ export class ErrorTxHandler {
           maxFeePerGas: tx.maxFeePerGas,
         }, tx.blockNumber);
         reason = decodeMessage(transaction);
-        // @ts-ignore
-        receipt = err.receipt;
       } catch (e) {
-        console.log('Error decode error', tx.hash, e);
-        return false;
+        console.log('Error decode error', tx.hash);
+        reason = 'UNKNOWN';
       }
     }
     if (receipt.status === 1) {

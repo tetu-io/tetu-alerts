@@ -30,6 +30,7 @@ export class Config {
   );
 
   rpcUrl: string;
+  rpcUrlWs: string;
   privateKey: string;
   networkScanApiKey: string;
   chain: Common;
@@ -53,6 +54,7 @@ export class Config {
     if (this.net === 'rinkeby') {
       this.chain = this.RINKEBY_CHAIN;
       this.rpcUrl = process.env.RINKEBY_URL as string;
+      this.rpcUrlWs = process.env.RINKEBY_URL_WS as string;
       this.networkScanApiKey = '';
       this.userActionDiscord = '';
       this.strategyEarnedDiscord = '';
@@ -62,6 +64,7 @@ export class Config {
     } else if (this.net === 'matic') {
       this.chain = this.MATIC_CHAIN;
       this.rpcUrl = process.env.MATIC_URL as string;
+      this.rpcUrlWs = process.env.MATIC_URL_WS as string;
       this.networkScanApiKey = process.env.POLYGONSCAN_API_KEY as string;
       this.userActionDiscord = process.env.MATIC_USER_ACTION_DISCORD as string;
       this.strategyEarnedDiscord = process.env.MATIC_STRATEGY_EARNED_DISCORD as string;
@@ -71,6 +74,7 @@ export class Config {
     } else if (this.net === 'fantom') {
       this.chain = this.FANTOM_CHAIN;
       this.rpcUrl = process.env.FANTOM_URL as string;
+      this.rpcUrlWs = process.env.FANTOM_URL_WS as string;
       this.networkScanApiKey = process.env.FTMSCAN_API_KEY as string;
       this.userActionDiscord = process.env.FANTOM_USER_ACTION_DISCORD as string;
       this.strategyEarnedDiscord = process.env.FANTOM_STRATEGY_EARNED_DISCORD as string;
