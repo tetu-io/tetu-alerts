@@ -33,8 +33,8 @@ describe("ErrorTxHandlerTest", function () {
     await errorTxHandler.handleTx(tx, targets);
   });
   it("handleTx2", async () => {
-    const targets = new Set<string>(['0xbe527f95815f906625f29fc084bfd783f4d00787'.toLowerCase()]);
-    const hash = '0xa12a46849d3847970cfb532c52db7aa8330c9129d5be544d6f4368775d6871ae';
+    const targets = new Set<string>(['0x6678814c273d5088114b6e40cc49c8db04f9bc29'.toLowerCase()]);
+    const hash = '0x35104913f6cceb42f0725755e16edccf56c3cae039b5b5f90c6c764af13ee850';
     const tx = await provider.getTransaction(hash);
     await errorTxHandler.handleTx(tx, targets);
   });

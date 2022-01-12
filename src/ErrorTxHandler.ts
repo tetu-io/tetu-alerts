@@ -44,25 +44,33 @@ export class ErrorTxHandler {
       return false;
     } catch (err) {
       // console.error(err);
-      try {
-        // @ts-ignore
-        receipt = err.receipt;
-        const transaction = await this.provider.call({
-          gasPrice: tx.gasPrice,
-          gasLimit: tx.gasLimit,
-          value: tx.value,
-          to: tx.to,
-          from: tx.from,
-          nonce: tx.nonce,
-          data: tx.data,
-          chainId: tx.chainId,
-          maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-          maxFeePerGas: tx.maxFeePerGas,
-        }, tx.blockNumber);
-        reason = decodeMessage(transaction);
-      } catch (e) {
-        console.log('Error decode error', tx.hash);
-        reason = 'UNKNOWN';
+      let errorDecodeTries = 0;
+      while (true) {
+        try {
+          // @ts-ignore
+          receipt = err.receipt;
+          const transaction = await this.provider.call({
+            gasPrice: tx.gasPrice,
+            gasLimit: tx.gasLimit,
+            value: tx.value,
+            to: tx.to,
+            from: tx.from,
+            nonce: tx.nonce,
+            data: tx.data,
+            chainId: tx.chainId,
+            maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+            maxFeePerGas: tx.maxFeePerGas,
+          }, tx.blockNumber);
+          reason = decodeMessage(transaction);
+        } catch (e) {
+          console.log('Error decode error', tx.hash);
+          reason = 'UNKNOWN';
+          errorDecodeTries++;
+          if (errorDecodeTries > 10) {
+            break;
+          }
+          Utils.delay(10_000);
+        }
       }
     }
     if (receipt.status === 1) {
@@ -86,6 +94,7 @@ export class ErrorTxHandler {
 }
 
 function decodeMessage(code: string) {
+  // console.log('decodeMessage', code);
   let codeString
   const fnSelectorByteLength = 4
   const dataOffsetByteLength = 32
