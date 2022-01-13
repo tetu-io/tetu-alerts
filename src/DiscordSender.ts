@@ -11,8 +11,11 @@ const HEADERS = {
 }
 
 const log: Logger = new Logger(logSettings);
+const rateLimit = 300;
 
 export class DiscordSender {
+
+  private static lastSentMessageTs = 0;
 
   public static async sendUserAction(
     deposit: boolean,
@@ -132,6 +135,10 @@ export class DiscordSender {
 
   private static async send(url: string, params: any) {
     if (url && url !== '') {
+      if (DiscordSender.lastSentMessageTs + rateLimit > Date.now()) {
+        console.log('rate limit reached with limit ms:', rateLimit);
+        Utils.delay(rateLimit);
+      }
       const http = axios.create();
       try {
         await http.post(url, params, {headers: HEADERS});
@@ -139,6 +146,7 @@ export class DiscordSender {
         log.error('Error send POST request', url, params);
         throw e;
       }
+      DiscordSender.lastSentMessageTs = Date.now();
     }
   }
 
