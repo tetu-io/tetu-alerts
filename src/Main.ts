@@ -1,5 +1,8 @@
 import {Parser} from "./Parser";
 
 // const script = process.env.SCRIPT
-
-Parser.start()
+try {
+  Parser.start()
+} catch (e) {
+  console.error('APP CRASHED', e);
+}
