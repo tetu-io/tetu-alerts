@@ -2,7 +2,6 @@ import {BigNumber, ethers, utils} from "ethers";
 import {DiscordSender} from "./DiscordSender";
 import {Utils} from "./Utils";
 import {
-  Bookkeeper, Bookkeeper__factory,
   ContractReader,
   Controller__factory,
   SmartVault__factory,
@@ -12,19 +11,12 @@ import {TransactionReceipt} from "@ethersproject/abstract-provider";
 import {Logger} from "tslog";
 import logSettings from "../log_settings";
 import {Config} from "./Config";
-import {EventFragment} from "@ethersproject/abi";
-import {RegisterUserActionEvent} from "../types/ethers-contracts/Bookkeeper";
-import {TypedEvent} from "../types/ethers-contracts/common";
 
 const log: Logger = new Logger(logSettings);
 
-const MIN_USER_ACTION_REPORT_VALUE = 1000;
+const MIN_USER_ACTION_REPORT_VALUE = 100_000;
 const MIN_EARNED_REPORT_VALUE = 10;
 const MAX_ERRORS = 5;
-
-const NOT_VAULT = [
-  '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase()
-]
 
 export class BookkeeperHandler {
 
@@ -49,7 +41,7 @@ export class BookkeeperHandler {
     while (true) {
       try {
         const receipt = await this.provider.getTransactionReceipt(transactionHash);
-        if(!receipt) {
+        if (!receipt) {
           console.log('Empty receipt for', transactionHash);
           Utils.delay(10000);
           errorCount++;
