@@ -65,10 +65,10 @@ export class ErrorTxHandler {
           }, tx.blockNumber);
           reason = decodeMessage(transaction);
         } catch (e) {
-          console.log('Error decode error', tx.hash);
+          // console.log('Error decode error', tx.hash);
           reason = 'UNKNOWN';
           errorDecodeTries++;
-          if (errorDecodeTries > 10) {
+          if (errorDecodeTries > 3) {
             break;
           }
           Utils.delay(10_000);
