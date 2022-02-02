@@ -49,6 +49,18 @@ describe("BookkeeperHandlerTest", function () {
     );
   });
 
+  it("handleStrategyEarned splitter", async () => {
+    const hash = '0x9827957b77ebf38d0e5ec22baa0433b0854a2edb1d4df7a4cda3935cb67831d1';
+    const receipt = await provider.getTransactionReceipt(hash);
+    let log = getLog(receipt, Constants.REGISTER_STRATEGY_EARNED_HASH);
+    const logParsed = Bookkeeper__factory.createInterface().parseLog(log);
+    await bookkeeperHandler.handleStrategyEarned(
+      logParsed.args.strategy,
+      logParsed.args.amount,
+      receipt
+    );
+  });
+
 });
 
 

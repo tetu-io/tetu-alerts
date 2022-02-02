@@ -4,12 +4,14 @@ import {Addresses} from "./addresses/addresses";
 import {ToolsAddresses} from "./addresses/ToolsAddresses";
 import {SpeedUp} from "./SpeedUp";
 import {Config} from "./Config";
-import {SmartVault__factory} from "../types/ethers-contracts";
+import {SmartVault__factory, Splitter__factory} from "../types/ethers-contracts";
 import axios from "axios";
 
 let networkScanLastCall = 0;
 
 export class Utils {
+
+  public static SPLITTER_PREFIX = 'SPLITTER___';
 
   public static delay(ms: number) {
     if (ms === 0) {
@@ -194,5 +196,15 @@ export class Utils {
     }
 
     return Utils.txPrettifyWithLink(adr);
+  }
+
+  public static async vaultName(vaultOrSplitter: string, provider: ethers.providers.Provider): Promise<string> {
+    try {
+      return await SmartVault__factory.connect(vaultOrSplitter, provider).name()
+    } catch (e) {
+      //assume it is splitter
+      const v = await Splitter__factory.connect(vaultOrSplitter, provider).vault();
+      return Utils.SPLITTER_PREFIX + await Utils.vaultName(v, provider);
+    }
   }
 }

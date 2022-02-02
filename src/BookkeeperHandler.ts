@@ -5,6 +5,7 @@ import {
   ContractReader,
   Controller__factory,
   SmartVault__factory,
+  Splitter__factory,
   Strategy__factory
 } from "../types/ethers-contracts";
 import {TransactionReceipt} from "@ethersproject/abstract-provider";
@@ -149,8 +150,7 @@ export class BookkeeperHandler {
     const strategyCtr = Strategy__factory.connect(strategy, this.provider);
     const strategyName = await strategyCtr.STRATEGY_NAME();
     const vaultAdr = await strategyCtr.vault();
-    const vaultCtr = SmartVault__factory.connect(vaultAdr, this.provider);
-    const vaultName = await vaultCtr.name();
+    const vaultName = await Utils.vaultName(vaultAdr, this.provider);
     const vaultNamePretty = Utils.formatVaultName(vaultName);
     const amountN = +utils.formatUnits(amount);
     const price = +utils.formatUnits(await this.reader.getPrice(core.rewardToken));
