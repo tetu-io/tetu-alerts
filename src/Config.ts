@@ -91,7 +91,7 @@ export class Config {
       this.importantMessageDiscord = process.env.FANTOM_IMPORTANT_MESSAGE_DISCORD as string;
       this.errorMessageDiscord = process.env.FANTOM_ERROR_MESSAGE_DISCORD as string;
     } else if (this.net === 'mainnet') {
-      this.chain = this.FANTOM_CHAIN;
+      this.chain = this.MAINNET_CHAIN;
       this.rpcUrl = process.env.MAINNET_URL as string;
       this.rpcUrlWs = process.env.MAINNET_URL_WS as string;
       this.networkScanApiKey = process.env.ETHSCAN_API_KEY as string;
