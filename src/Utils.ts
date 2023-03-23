@@ -114,6 +114,8 @@ export class Utils {
         return 'https://polygonscan.com';
       case 'fantom':
         return 'https://ftmscan.com';
+      case 'mainnet':
+        return 'https://etherscan.com'
     }
   }
 
@@ -124,6 +126,8 @@ export class Utils {
         return 'https://api.polygonscan.com/api';
       case 'fantom':
         return 'https://api.ftmscan.com/api';
+      case 'mainnet' :
+        return 'https://api.etherscan.io/api';
     }
   }
 

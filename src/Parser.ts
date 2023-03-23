@@ -4,13 +4,14 @@ import {
   Announcer__factory,
   Bookkeeper__factory,
   ContractReader__factory,
-  Controller__factory
+  Controller__factory, Splitter__factory
 } from "../types/ethers-contracts";
 import {Utils} from "./Utils";
 import {AnnouncerHandler} from "./AnnouncerHandler";
 import {BookkeeperHandler} from "./BookkeeperHandler";
 import {ControllerHandler} from "./ControllerHandler";
 import {ErrorTxHandler} from "./ErrorTxHandler";
+import { SplitterHandler } from "./SplitterHandler";
 
 require('dotenv').config();
 
@@ -31,6 +32,7 @@ export class Parser {
     const bookkeeperHandler = new BookkeeperHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const controllerHandler = new ControllerHandler(provider, ContractReader__factory.connect(tools.reader, provider));
     const errorTxHandler = new ErrorTxHandler(provider, ContractReader__factory.connect(tools.reader, provider));
+    const splitterHandler = new SplitterHandler(provider);
 
     const controller = Controller__factory.connect(core.controller, provider);
     const announcer = Announcer__factory.connect(await controller.announcer(), provider);
@@ -57,6 +59,17 @@ export class Parser {
     const vaultLength = (await bookkeeper.vaultsLength()).toNumber();
     for (let i = 0; i < vaultLength; i++) {
       listeningAddresses.add((await bookkeeper._vaults(i)).toLowerCase());
+    }
+    const strategiesAddress = (await bookkeeper.strategies());
+    for (let i = 0; i < strategiesAddress.length; i++) {
+      const strategySplitter = Splitter__factory.connect(strategiesAddress[i], provider);
+      strategySplitter.on(strategySplitter.filters.StrategyAdded(), async (strategy, event) => {
+        await splitterHandler.handleStrategyAdded(strategy, await event.getTransactionReceipt())
+      });
+
+      strategySplitter.on(strategySplitter.filters.StrategyRemoved(), async (strategy, event) => {
+        await splitterHandler.handleStrategyRemoved(strategy, await event.getTransactionReceipt());
+      })
     }
 
     provider.on('block', async (block: string) => {
