@@ -7,6 +7,7 @@ import {ToolsAddresses} from "./ToolsAddresses";
 import {FtmCoreAddresses} from "./addresses_core_ftm";
 import {FtmToolsAddresses} from "./addresses_tools_ftm";
 import { MainnetCoreAddresses } from "./addresses_core_mainnet";
+import { MainnetToolsAddresses } from "./addresses_tools_mainnet";
 
 export class Addresses {
 
@@ -21,7 +22,7 @@ export class Addresses {
     ['137', MaticToolsAddresses.ADDRESSES],
     ['250', FtmToolsAddresses.ADDRESSES],
     ['4', RinkebyToolsAddresses.ADDRESSES],
-    ['1', MaticToolsAddresses.ADDRESSES]
+    ['1', MainnetToolsAddresses.ADDRESSES]
   ]);
 
   public static TOKENS = new Map<string, Map<string, string>>([
