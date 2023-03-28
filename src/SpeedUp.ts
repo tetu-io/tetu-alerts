@@ -48,6 +48,7 @@ export class SpeedUp {
       return 'error';
     }
 
+    // @ts-ignore
     const nonce = Web3.utils.hexToNumber(result.nonce) + addNonce;
     // console.log('nonce', nonce);
 

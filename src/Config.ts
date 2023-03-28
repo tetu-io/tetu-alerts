@@ -29,6 +29,15 @@ export class Config {
     'petersburg'
   );
 
+  public readonly MAINNET_CHAIN = Common.forCustomChain(
+    'mainnet', {
+      name: 'mainnet',
+      networkId: 1,
+      chainId: 1
+    },
+    'petersburg'
+  );
+
   rpcUrl: string;
   rpcUrlWs: string;
   privateKey: string;
@@ -81,6 +90,16 @@ export class Config {
       this.timeLocksDiscord = process.env.FANTOM_TIME_LOCKS_DISCORD as string;
       this.importantMessageDiscord = process.env.FANTOM_IMPORTANT_MESSAGE_DISCORD as string;
       this.errorMessageDiscord = process.env.FANTOM_ERROR_MESSAGE_DISCORD as string;
+    } else if (this.net === 'mainnet') {
+      this.chain = this.MAINNET_CHAIN;
+      this.rpcUrl = process.env.MAINNET_URL as string;
+      this.rpcUrlWs = process.env.MAINNET_URL_WS as string;
+      this.networkScanApiKey = process.env.ETHSCAN_API_KEY as string;
+      this.userActionDiscord = process.env.MAINNET_USER_ACTION_DISCORD as string;
+      this.strategyEarnedDiscord = process.env.MAINNET_STRATEGY_EARNED_DISCORD as string;
+      this.timeLocksDiscord = process.env.MAINNET_TIME_LOCKS_DISCORD as string;
+      this.importantMessageDiscord = process.env.MAINNET_IMPORTANT_MESSAGE_DISCORD as string;
+      this.errorMessageDiscord = process.env.MAINNET_ERROR_MESSAGE_DISCORD as string;
     } else {
       throw Error('Unknown network ' + this.net);
     }
